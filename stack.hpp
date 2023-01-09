@@ -1,5 +1,5 @@
 
-# include <vector> //ENLEVER
+# include <vector> //ENLEVER !
 
 #ifndef VECTOR_HPP
 # define VECTOR_HPP
@@ -90,6 +90,9 @@ namespace ft
 
 			template < class T, class Container >
 			friend bool operator>= (const ft::stack<T, Container>& lhs, const ft::stack<T, Container>& rhs);
+
+		private:
+			container_type _ctnr;
 
 	};
 
