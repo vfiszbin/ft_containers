@@ -11,7 +11,9 @@ namespace ft
 	class vector
 	{
 		public:
-			/// Member types ///
+			///---------------///
+			/// MEMBER TYPES ///
+			///---------------///
 			typedef T value_type;
 			typedef Alloc allocator_type;
 			typedef typename allocator_type::reference reference;
@@ -25,8 +27,9 @@ namespace ft
 			typedef std::ptrdiff_t difference_type; //can represent the number of element between two pointers
 			typedef std::size_t size_type;
 
-
-			/// Member functions ///
+			///------------------///
+			/// MEMBER FUNCTIONS ///
+			///------------------///
 
 			//Default constructor (empty container constructor)
 			explicit vector (const allocator_type& alloc = allocator_type()) : _alloc(alloc), _start(0),  _size(0), _capacity(0) {}
@@ -106,6 +109,65 @@ namespace ft
 				if(_capacity != 0)
 					_alloc.deallocate(_start, _capacity);
 			}
+
+			/// ITERATORS ///
+
+			//Returns an iterator pointing to the first element in the vector
+			iterator begin()
+			{
+				return iterator(_start);
+			}
+
+			//Returns a const iterator pointing to the first element in the vector
+			const_iterator begin() const
+			{
+				return const_iterator(_start);
+			}
+
+			//Returns an iterator referring to the past-the-end element in the vector container.
+			//The past-the-end element is the theoretical element that would follow the last element in the vector.
+			iterator end()
+			{
+				return iterator(_first + _size);
+			}
+
+			//Returns a const iterator referring to the past-the-end element in the vector container.
+			//The past-the-end element is the theoretical element that would follow the last element in the vector.
+			const_iterator end() const
+			{
+				return const_iterator(_first + _size);
+			}
+
+			//Returns a reverse iterator pointing to the last element in the vector (reverse beginning).
+			//Reverse iterators iterate backwards: increasing them moves them towards the beginning of the container.
+			//rbegin points to the element right before the one that would be pointed to by member end.
+			reverse_iterator rbegin()
+			{
+				return reverse_iterator(end());
+			}
+
+			//Returns a const reverse iterator pointing to the last element in the vector (reverse beginning).
+			//Reverse iterators iterate backwards: increasing them moves them towards the beginning of the container.
+			//rbegin points to the element right before the one that would be pointed to by member end.
+			const_reverse_iterator rbegin() const
+			{
+				return const_reverse_iterator(end());
+			}
+
+			//Returns a reverse iterator pointing to the theoretical element preceding the first element in the vector (reverse end).
+			reverse_iterator rend()
+			{
+				return reverse_iterator(begin());
+			}
+
+			//Returns a const reverse iterator pointing to the theoretical element preceding the first element in the vector (reverse end).
+			const_reverse_iterator rend() const
+			{
+				return const_reverse_iterator(begin());
+			}
+
+
+
 
 			private:
 				//Private variables
