@@ -20,10 +20,10 @@ namespace ft
 			typedef typename allocator_type::const_pointer const_pointer;
 			typedef typename std::vector<value_type>::iterator iterator; //Mettre mon propre iterator !
 			typedef typename std::vector<value_type>::const_iterator const_iterator; //Mettre mon propre iterator !
-			typedef typename std::vector<value_type>::template reverse_iterator<iterator> reverse_iterator; //Mettre mon propre iterator !
-			typedef typename std::vector<value_type>::template reverse_iterator<const_iterator> const_reverse_iterator; //Mettre mon propre iterator !
-			typedef ptrdiff_t difference_type; //can represent the number of element between two pointers
-			typedef size_t size_type;
+			typedef typename std::vector<value_type>::reverse_iterator reverse_iterator; //Mettre mon propre iterator !
+			typedef typename std::vector<value_type>::reverse_iterator const_reverse_iterator; //Mettre mon propre iterator !
+			typedef std::ptrdiff_t difference_type; //can represent the number of element between two pointers
+			typedef std::size_t size_type;
 
 
 			/// Member functions ///
