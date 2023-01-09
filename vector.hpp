@@ -106,7 +106,7 @@ namespace ft
 					_alloc.destroy(_start + i);
 
 				//Deallocate memory block
-				if(_capacity != 0)
+				if (_capacity != 0)
 					_alloc.deallocate(_start, _capacity);
 			}
 
@@ -166,7 +166,86 @@ namespace ft
 				return const_reverse_iterator(begin());
 			}
 
+			/// CAPACITY ///
 
+			//Returns the number of elements in the vector.
+			size_type size() const
+			{
+				return _size;
+			}
+
+			//Returns the maximum number of elements that the vector can hold
+			size_type max_size() const
+			{
+				return _alloc.max_size();
+			}
+
+			//Resizes the container so that it contains n elements.
+			void resize (size_type n, value_type val = value_type())
+			{
+				//If n is smaller than the current container size, the content is reduced to its first n elements
+				if (n < _size)
+				{
+					//Destroy objects beyond n
+					for (size_type i = n; i < _size; i++)
+						_alloc.destroy(_start + i);
+					
+					_size = n;
+				}
+				//If n is greater than the current container size, the content is expanded by inserting at the end as many elements as needed to reach a size of n.
+				//If val is specified, the new elements are initialized as copies of val, otherwise, they are value-initialized.
+				else if (n > _size)
+				{
+					//If n is also greater than the current container capacity, an automatic reallocation of the allocated storage space takes place.
+					if (n > _capacity)
+						reserve(n);
+
+					for (size_type i = _size; i < n; i++)
+						_alloc.construct(_start + i, val); //constructs (by calling the constructor of value_type with argument val) an element object on the location pointed by _start + i
+					
+					_size = n;
+				}
+			}
+
+			//Returns the size of the storage space currently allocated for the vector
+			size_type capacity() const
+			{
+				return _capacity;
+			}
+
+			//Returns whether the vector is empty (whether its size is 0).
+			bool empty() const
+			{
+				return _size == 0;
+			}
+
+			//Requests that the vector capacity be at least enough to contain n elements.
+			void reserve (size_type n)
+			{
+				if (n > max_size())
+					throw (std::length_error("vector::reserve"));
+
+				//If current capacity is sufficient, do nothing
+				if (n <= _capacity)
+					return;
+
+				//PROTEGER LA PARTIE ALLOCATION ET CONSTRUCT ?!
+				//Allocate a new block of memory and copy the old container into the new one
+				pointer new_start = _alloc.allocate(n); //allocates a block of storage with a size large enough to contain n elements of type value_type
+				for (size_type i = 0; i < _size; i++)
+					_alloc.construct(new_start + i, *(_start + i)); //constructs (by calling the constructor of value_type with argument val) an element object on the location pointed by _start + i
+
+				//Destroy objects in the old container
+				for (size_type i = 0; i < _size; i++)
+					_alloc.destroy(_start + i);
+				//Deallocate the old memory block
+				if (_capacity != 0)
+					_alloc.deallocate(_start, _capacity);
+
+				//Update the container pointer and capacity
+				_start = new_start;
+				_capacity = n;
+			}
 
 
 			private:
