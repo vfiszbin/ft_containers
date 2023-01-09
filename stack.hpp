@@ -13,22 +13,22 @@ namespace ft
 			/// Member types ///
 			typedef T value_type;
 			typedef Container container_type;
-			typedef size_t size_type;
+			typedef std::size_t size_type;
 
 
 			/// Member functions ///
 
 			//Constructor
-			explicit stack (const container_type& ctnr = container_type()) : __ctnr(ctnr) {}
+			explicit stack (const container_type& ctnr = container_type()) : _ctnr(ctnr) {}
 			//explicit keyword prevents implicit call to the constructor
 
 			//Copy constructor
-			stack(const stack& s): _container(s.__ctnr) {}
+			stack(const stack& s): _ctnr(s._ctnr) {}
 
 			//Assignment operator
 			stack& operator=(const stack & s)
 			{
-				__ctnr = s._ctnr;
+				_ctnr = s._ctnr;
 				return (*this);
 			}
 
@@ -38,13 +38,13 @@ namespace ft
 			//Test whether container is empty
 			bool empty() const
 			{
-				return __ctnr.empty();
+				return _ctnr.empty();
 			}
 
 			//Return size
 			size_type size() const
 			{
-				return _ctnr.size()
+				return _ctnr.size();
 			}
 
 			//Access next element
@@ -73,23 +73,23 @@ namespace ft
 
 			//Declare relational operators functions as friends of the stack class
 			//It is necessary because these functions must access the private member _ctnr
-			template < class T, class Container >
-			friend bool operator== (const ft::stack<T, Container>& lhs, const ft::stack<T, Container>& rhs);
+			template < class T_rops, class Container_rops >
+			friend bool operator== (const ft::stack<T_rops, Container_rops>& lhs, const ft::stack<T_rops, Container_rops>& rhs);
 
-			template < class T, class Container >
-			friend bool operator!= (const ft::stack<T, Container>& lhs, const ft::stack<T, Container>& rhs);
+			template < class T_rops, class Container_rops >
+			friend bool operator!= (const ft::stack<T_rops, Container_rops>& lhs, const ft::stack<T_rops, Container_rops>& rhs);
 			
-			template < class T, class Container >
-			friend bool operator< (const ft::stack<T, Container>& lhs, const ft::stack<T, Container>& rhs);
+			template < class T_rops, class Container_rops >
+			friend bool operator< (const ft::stack<T_rops, Container_rops>& lhs, const ft::stack<T_rops, Container_rops>& rhs);
 
-			template < class T, class Container >
-			friend bool operator<= (const ft::stack<T, Container>& lhs, const ft::stack<T, Container>& rhs);
+			template < class T_rops, class Container_rops >
+			friend bool operator<= (const ft::stack<T_rops, Container_rops>& lhs, const ft::stack<T_rops, Container_rops>& rhs);
 
-			template < class T, class Container >
-			friend bool operator> (const ft::stack<T, Container>& lhs, const ft::stack<T, Container>& rhs);
+			template < class T_rops, class Container_rops >
+			friend bool operator> (const ft::stack<T_rops, Container_rops>& lhs, const ft::stack<T_rops, Container_rops>& rhs);
 
-			template < class T, class Container >
-			friend bool operator>= (const ft::stack<T, Container>& lhs, const ft::stack<T, Container>& rhs);
+			template < class T_rops, class Container_rops >
+			friend bool operator>= (const ft::stack<T_rops, Container_rops>& lhs, const ft::stack<T_rops, Container_rops>& rhs);
 
 		private:
 			container_type _ctnr;
