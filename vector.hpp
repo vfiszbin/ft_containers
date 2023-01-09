@@ -21,7 +21,7 @@ namespace ft
 			typedef typename std::vector<value_type>::iterator iterator; //Mettre mon propre iterator !
 			typedef typename std::vector<value_type>::const_iterator const_iterator; //Mettre mon propre iterator !
 			typedef typename std::vector<value_type>::reverse_iterator reverse_iterator; //Mettre mon propre iterator !
-			typedef typename std::vector<value_type>::reverse_iterator const_reverse_iterator; //Mettre mon propre iterator !
+			typedef typename std::vector<value_type>::const_reverse_iterator const_reverse_iterator; //Mettre mon propre iterator !
 			typedef std::ptrdiff_t difference_type; //can represent the number of element between two pointers
 			typedef std::size_t size_type;
 
