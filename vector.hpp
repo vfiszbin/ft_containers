@@ -128,14 +128,14 @@ namespace ft
 			//The past-the-end element is the theoretical element that would follow the last element in the vector.
 			iterator end()
 			{
-				return iterator(_first + _size);
+				return iterator(_start + _size);
 			}
 
 			//Returns a const iterator referring to the past-the-end element in the vector container.
 			//The past-the-end element is the theoretical element that would follow the last element in the vector.
 			const_iterator end() const
 			{
-				return const_iterator(_first + _size);
+				return const_iterator(_start + _size);
 			}
 
 			//Returns a reverse iterator pointing to the last element in the vector (reverse beginning).
@@ -198,7 +198,7 @@ namespace ft
 				{
 					//If n is also greater than the current container capacity, an automatic reallocation of the allocated storage space takes place.
 					if (n > _capacity)
-						reserve(n);
+						reserve(n); //ALLOUER PLUS ?
 
 					for (size_type i = _size; i < n; i++)
 						_alloc.construct(_start + i, val); //constructs (by calling the constructor of value_type with argument val) an element object on the location pointed by _start + i
@@ -247,6 +247,143 @@ namespace ft
 				_capacity = n;
 			}
 
+			/// ELEMENT ACCESS ///
+
+			//Returns a reference to the element at position n in the vector container.
+			reference operator[] (size_type n)
+			{
+				return *(_start + n);
+			}
+			
+			//Returns a const reference to the element at position n in the vector container.
+			const_reference operator[] (size_type n) const
+			{
+				return *(_start + n);
+			}
+
+			//Returns a reference to the element at position n in the vector.
+			//The function automatically checks whether n is within the bounds of valid elements in the vector, throwing an out_of_range exception if it is not
+			reference at (size_type n)
+			{
+				if (n >= _size)
+					throw std::out_of_range("vector::at index out of range");
+
+				return *(_start + n);
+			}
+
+			//Returns a const reference to the element at position n in the vector.
+			//The function automatically checks whether n is within the bounds of valid elements in the vector, throwing an out_of_range exception if it is not	
+			const_reference at (size_type n) const
+			{
+				if (n >= _size)
+					throw std::out_of_range("vector::at index out of range");
+
+				return *(_start + n);
+			}
+
+			//Returns a reference to the first element in the vector.
+			//Unlike member vector::begin, which returns an iterator to this element
+			reference front()
+			{
+				return *_start;
+			}
+			
+			//Returns a const reference to the first element in the vector.
+			//Unlike member vector::begin, which returns an iterator to this element
+			const_reference front() const
+			{
+				return *_start;
+			}
+
+			//Returns a reference to the last element in the vector.
+			//Unlike member vector::end, which returns an iterator just past this element
+			reference back()
+			{
+				return *(_start + _size - 1);
+			}
+			
+			//Returns a const reference to the last element in the vector.
+			//Unlike member vector::end, which returns an iterator just past this element
+			const_reference back() const
+			{
+				return *(_start + _size - 1);
+			}
+
+			/// MODIFIERS ///
+
+			//Assigns new contents to the vector, replacing its current contents, and modifying its size accordingly.
+			//In the range version, the new contents are elements constructed from each of the elements in the range between first and last, in the same order.
+			template <class InputIterator>  
+			void assign (InputIterator first, InputIterator last) //SFINAE !
+			{
+				if (first > last)
+					throw std::length_error("vector::assign");
+
+				//Destroy all previous elements held in the container
+				clear();
+
+				//Reallocate storage space if necessary
+				size_type nb_elements = static_cast<size_type>(last - first);
+				if (nb_elements > _capacity)
+				{
+					//Deallocate existing storage space
+					_alloc.deallocate(_start, _capacity);
+					_start = _alloc(nb_elements);
+					_capacity = nb_elements;
+				}
+				//Construct with new elements
+				for (size_type i = 0; first != last; i++, first++) //iteration ok ?
+					_alloc.construct(_start + i, *first);
+
+				_size = nb_elements;
+			}
+
+			//Assigns new contents to the vector, replacing its current contents, and modifying its size accordingly.
+			//In the fill version, the new contents are n elements, each initialized to a copy of val.
+			void assign (size_type n, const value_type& val)
+			{
+				//Destroy all previous elements held in the container
+				clear();
+
+				//Reallocate storage space if necessary
+				if (n > _capacity)
+				{
+					//Deallocate existing storage space
+					_alloc.deallocate(_start, _capacity);
+					_start = _alloc(n);
+					_capacity = n;
+				}
+				//Construct with new elements
+				for (size_type i = 0; i < n; i++)
+					_alloc.construct(_start + i, val);
+
+				_size = n;
+			}
+
+			//Adds a new element at the end of the vector, after its current last element.
+			void push_back (const value_type& val)
+			{
+				//Reallocation if new vector size surpasses the current vector capacity
+				if (_size == _capacity)
+				{
+					if (_capacity == 0)
+						reserve(1);
+					else
+						reserve(_capacity * 2); //double the current capacity to prevent frequent reallocation
+				}
+
+				//Construct the new element
+				_alloc.construct(_start + _size, val);
+				_size++;
+			}
+
+			//Removes the last element in the vector, effectively reducing the container size by one.
+			void pop_back()
+			{
+				//Destroy the last element
+				_alloc.destroy(_start + _size - 1);
+				_size--;
+			}
 
 			private:
 				//Private variables
