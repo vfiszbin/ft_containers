@@ -3,6 +3,7 @@
 
 # include <memory>
 # include <vector> //RETIRER !!!
+# include <stdexcept>
 
 
 namespace ft
@@ -384,6 +385,197 @@ namespace ft
 				_alloc.destroy(_start + _size - 1);
 				_size--;
 			}
+
+			//The vector is extended by inserting new elements before the element at the specified position,
+			//effectively increasing the container size by the number of elements inserted.
+			//Single element
+			iterator insert (iterator position, const value_type& val)
+			{
+				size_type insert_index =  static_cast<size_type>(position - _start);
+				insert(position, 1, val);
+				return iterator(_start + insert_index);
+			}
+
+			//The vector is extended by inserting new elements before the element at the specified position,
+			//effectively increasing the container size by the number of elements inserted.
+			//Fill
+			void insert (iterator position, size_type n, const value_type& val)
+			{
+				if (n > max_size() - _size || position < begin() || position > end())
+					throw std::length_error("vector::insert");
+
+				size_type insert_index =  static_cast<size_type>(position - _start);
+
+				//Reallocation if new vector size surpasses the current vector capacity
+				if (_size + n > _capacity)
+				{
+					pointer new_start = _alloc.allocate(_size + n); //ALLOUER PLUS ?!
+					
+					//Reconstruct elements in new array up until the insert_index
+					for (size_type i = 0; i < (insert_index - 1); i++)
+					{
+						_alloc.construct(new_start + i, *(_start + i));
+						_alloc.destroy(_start + i);
+					}
+
+					//Move all elemets after insert_index + n to their old position + n
+					size_type end_of_insert_index = insert_index + n; //where the insertion stops, which is the new beginning index for the displaced elements
+					for (size_type i = end_of_insert_index; i < (end_of_insert_index + n); i++)
+					{
+							_alloc.construct(new_start + i, *(_start + i - n));
+							_alloc.destroy(_start + i - n);
+					}
+					
+					//Insert the n new elements copied from val starting at insert_index
+					for (size_type i = insert_index; i < end_of_insert_index; i++)
+						_alloc.construct(new_start + i, val);
+
+					_alloc.deallocate(_start, _capacity);
+					_start = new_start;
+					_capacity = _size + n;
+					_size += n;
+				}
+				//If no reallocation necessary, directly displace elements and insert n copies of val
+				else
+				{
+					//Move all elemets after insert_index + n to their old position + n
+					size_type end_of_insert_index = insert_index + n; //where the insertion stops, which is the new beginning index for the displaced elements
+					for (size_type i = end_of_insert_index; i < (end_of_insert_index + n); i++)
+					{
+							_alloc.construct(_start + i, *(_start + i - n));
+							_alloc.destroy(_start + i - n);
+					}
+					
+					//Insert the n new elements copied from val starting at insert_index
+					for (size_type i = insert_index; i < end_of_insert_index; i++)
+						_alloc.construct(_start + i, val);
+
+					_size += n;
+				}
+			}
+
+			//The vector is extended by inserting new elements before the element at the specified position,
+			//effectively increasing the container size by the number of elements inserted.
+			//Range
+			template <class InputIterator>    
+			void insert (iterator position, InputIterator first, InputIterator last) //SFINAE !
+			{
+				if (first > last || position < begin() || position > end())
+					throw std::length_error("vector::insert");
+
+				size_type n = static_cast<size_type>(last - first);
+				size_type insert_index =  static_cast<size_type>(position - _start);
+
+				//Reallocation if new vector size surpasses the current vector capacity
+				if (_size + n > _capacity)
+				{
+					pointer new_start = _alloc.allocate(_size + n); //ALLOUER PLUS ?!
+					
+					//Reconstruct elements in new array up until the insert_index
+					for (size_type i = 0; i < (insert_index - 1); i++)
+					{
+						_alloc.construct(new_start + i, *(_start + i));
+						_alloc.destroy(_start + i);
+					}
+
+					//Move all elemets after insert_index + n to their old position + n
+					size_type end_of_insert_index = insert_index + n; //where the insertion stops, which is the new beginning index for the displaced elements
+					for (size_type i = end_of_insert_index; i < (end_of_insert_index + n); i++)
+					{
+							_alloc.construct(new_start + i, *(_start + i - n));
+							_alloc.destroy(_start + i - n);
+					}
+					
+					//Insert the n new elements copied from the range starting at insert_index
+					for (size_type i = insert_index, j = 0; i < end_of_insert_index; i++, j++)
+						_alloc.construct(new_start + i, *(first + j));
+
+					_alloc.deallocate(_start, _capacity);
+					_start = new_start;
+					_capacity = _size + n;
+					_size += n;
+				}
+				//If no reallocation necessary, directly displace elements and insert n copies of val
+				else
+				{
+					//Move all elemets after insert_index + n to their old position + n
+					size_type end_of_insert_index = insert_index + n; //where the insertion stops, which is the new beginning index for the displaced elements
+					for (size_type i = end_of_insert_index; i < (end_of_insert_index + n); i++)
+					{
+							_alloc.construct(_start + i, *(_start + i - n));
+							_alloc.destroy(_start + i - n);
+					}
+					
+					//Insert the n new elements copied from the range starting at insert_index
+					for (size_type i = insert_index, j = 0; i < end_of_insert_index; i++, j++)
+						_alloc.construct(_start + i, *(first + j));
+
+					_size += n;
+				}
+			}
+
+			//Removes from the vector a single element
+			iterator erase (iterator position)
+			{
+				size_type erase_index =  static_cast<size_type>(position - _start);
+
+				//Move all elements one index to the left
+				for (size_type i = erase_index; i < _size - 1; i++) //s'arrete au bon indice ?!
+				{
+					_alloc.construct(_start + i, *(_start + i + 1));
+					_alloc.destroy(_start + i + 1);
+				}
+
+				_size--;
+				return iterator(_start + erase_index);
+			}
+			
+			//Removes from the vector a range of elements [first,last)
+			iterator erase (iterator first, iterator last)
+			{
+				
+				size_type n =  static_cast<size_type>(last - first);
+				size_type erase_index =  static_cast<size_type>(first - _start);
+
+				//Move all elements n indices to the left
+				for (size_type i = erase_index; i < _size - n - 1; i++) //s'arrete au bon indice ?!
+				{
+					_alloc.destroy(_start + i);
+					_alloc.construct(_start + i, *(_start + n + i));
+					_alloc.destroy(_start + n + i);
+				}
+
+				_size -= n;
+				return iterator(_start + erase_index);
+			}
+
+			//Exchanges the content of the container by the content of x, which is another vector object of the same type.
+			void swap (vector& x)
+			{
+				std::swap(_alloc, x._alloc);
+				std::swap(_start, x._start);
+				std::swap(_capacity, x._capacity);
+				std::swap(_size, x._size);
+			}
+
+			//Removes all elements from the vector (which are destroyed), leaving the container with a size of 0.
+			void clear()
+			{
+				for (size_type i = 0; i < _size; i++)
+					_alloc.destroy(_start + i);
+
+				_size = 0;
+			}
+
+			/// ALLOCATOR ///
+
+			//Returns a copy of the allocator object associated with the vector.
+			allocator_type get_allocator() const
+			{
+				return allocator_type(_alloc);
+			}
+
+
 
 			private:
 				//Private variables
