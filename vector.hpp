@@ -630,6 +630,15 @@ namespace ft
 	{
 		return !(lhs < rhs);
 	}
+
+	/// SWAP ///
+	
+	//Overload of the swap function
+	template <class T, class Alloc>
+	void swap (vector<T,Alloc>& x, vector<T,Alloc>& y)
+	{
+		x.swap(y);
+	}
 }
 
 
