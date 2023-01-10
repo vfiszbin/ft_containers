@@ -4,6 +4,7 @@
 # include <memory>
 # include <vector> //RETIRER !!!
 # include <stdexcept>
+# include <type_traits> //RETIRER !!!
 
 
 namespace ft
@@ -49,7 +50,9 @@ namespace ft
 
 			//Range constructor
 			//Constructs a container with as many elements as the range [first,last), with each element constructed from its corresponding element in that range, in the same order.
-			template <class InputIterator> vector (InputIterator first, InputIterator last, const allocator_type& alloc = allocator_type()) //SFINAE !!!
+			template <class InputIterator> vector (InputIterator first, InputIterator last, const allocator_type& alloc = allocator_type(),
+				typename std::enable_if< ! std::is_integral<InputIterator>::value >::type* = 0) //disable this overload if enable_if condition not statisfied. Arugments must be dereferenceable) 
+			//SFINAE ! REMPLACER PAR MES IMPLEMENTATIONS !
 			{
 				if (first > last)
 					throw std::length_error("vector");
@@ -315,7 +318,9 @@ namespace ft
 			//Assigns new contents to the vector, replacing its current contents, and modifying its size accordingly.
 			//In the range version, the new contents are elements constructed from each of the elements in the range between first and last, in the same order.
 			template <class InputIterator>  
-			void assign (InputIterator first, InputIterator last) //SFINAE !
+			void assign (InputIterator first, InputIterator last,
+				typename std::enable_if< ! std::is_integral<InputIterator>::value >::type* = 0) //disable this overload if enable_if condition not statisfied. Arugments must be dereferenceable
+				//SFINAE ! REMPLACER PAR MES IMPLEMENTATIONS !
 			{
 				if (first > last)
 					throw std::length_error("vector::assign");
@@ -329,7 +334,7 @@ namespace ft
 				{
 					//Deallocate existing storage space
 					_alloc.deallocate(_start, _capacity);
-					_start = _alloc(nb_elements);
+					_start = _alloc.allocate(nb_elements);
 					_capacity = nb_elements;
 				}
 				//Construct with new elements
@@ -351,7 +356,7 @@ namespace ft
 				{
 					//Deallocate existing storage space
 					_alloc.deallocate(_start, _capacity);
-					_start = _alloc(n);
+					_start = _alloc.allocate(n);
 					_capacity = n;
 				}
 				//Construct with new elements
@@ -458,7 +463,9 @@ namespace ft
 			//effectively increasing the container size by the number of elements inserted.
 			//Range
 			template <class InputIterator>    
-			void insert (iterator position, InputIterator first, InputIterator last) //SFINAE !
+			void insert (iterator position, InputIterator first, InputIterator last,
+				typename std::enable_if< ! std::is_integral<InputIterator>::value >::type* = 0) //disable this overload if enable_if condition not statisfied. Arugments must be dereferenceable) 
+			//SFINAE ! REMPLACER PAR MES IMPLEMENTATIONS !
 			{
 				if (first > last || position < begin() || position > end())
 					throw std::length_error("vector::insert");
@@ -632,7 +639,7 @@ namespace ft
 	}
 
 	/// SWAP ///
-	
+
 	//Overload of the swap function
 	template <class T, class Alloc>
 	void swap (vector<T,Alloc>& x, vector<T,Alloc>& y)
