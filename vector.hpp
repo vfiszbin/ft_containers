@@ -575,18 +575,61 @@ namespace ft
 				return allocator_type(_alloc);
 			}
 
-
-
 			private:
 				//Private variables
 				allocator_type _alloc; //allocator object to allocate/free memory dynamically
 				pointer _start; //pointer to the beginning of the array
 				size_type _size; //current number of elements in the array
 				size_type _capacity; //full capacity of the allocated array
-			
-
-
 	};
+
+	///-------------------------------///
+	/// NON-MEMBER FUNCTION OVERLOADS ///
+	///-------------------------------///
+
+	/// RELATIONAL OPERATORS ///
+
+	template <class T, class Alloc>
+	bool operator== (const vector<T, Alloc>& lhs, const vector<T, Alloc>& rhs)
+	{
+		if (lhs.size() != rhs.size())
+			return false;
+		
+		for (size_t i = 0; i < lhs.size(); i++)
+			if ( !(lhs[i] == rhs[i]) )
+				return false;
+		return true;
+	}
+
+	template <class T, class Alloc>
+	bool operator!= (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
+	{
+		return !(lhs == rhs);
+	}
+
+	template <class T, class Alloc>
+	bool operator<  (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
+	{
+		return std::lexicographical_compare( lhs.begin(), lhs.end(), rhs.begin(), rhs.end() ); //CHANGER POUR MON FT LEXICO COMPARE !!!
+	}
+
+	template <class T, class Alloc>
+	bool operator<= (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
+	{
+		return !(rhs < lhs);
+	}
+
+	template <class T, class Alloc>
+	bool operator>  (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
+	{
+		return rhs < lhs;
+	}
+
+	template <class T, class Alloc>
+	bool operator>= (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
+	{
+		return !(lhs < rhs);
+	}
 }
 
 
