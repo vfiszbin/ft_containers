@@ -54,14 +54,16 @@ namespace ft
 				typename std::enable_if< ! std::is_integral<InputIterator>::value >::type* = 0) //disable this overload if enable_if condition not statisfied. Arugments must be dereferenceable) 
 			//SFINAE ! REMPLACER PAR MES IMPLEMENTATIONS !
 			{
-				if (first > last)
+				difference_type diff = std::distance(first, last);
+				if (diff < 0)
 					throw std::length_error("vector");
+
+				_size = static_cast<size_type>(diff);
 				_alloc = alloc;
-				_size = last - first;
 				_capacity = _size;
 				_start = _alloc.allocate(_size); //allocates a block of storage with a size large enough to contain _size elements of type value_type
-				for (difference_type i = 0; i < _size; i++)
-					_alloc.construct(_start + i, *(first + i)); //constructs (by calling the constructor of value_type with the corresponding range element as argument) an element object on the location pointed by _start + i
+				for (size_type i = 0; i < _size; i++, first++)
+					_alloc.construct(_start + i, *first); //constructs (by calling the constructor of value_type with the corresponding range element as argument) an element object on the location pointed by _start + i
 			}
 
 			//Copy constructor
@@ -69,6 +71,8 @@ namespace ft
 			//The copy constructor creates a container that keeps and uses a copy of x's allocator.
 			vector (const vector& x)
 			{
+				_size = 0;
+				_capacity = 0;
 				_alloc = x._alloc;
 				*this = x;
 			}
@@ -322,14 +326,15 @@ namespace ft
 				typename std::enable_if< ! std::is_integral<InputIterator>::value >::type* = 0) //disable this overload if enable_if condition not statisfied. Arugments must be dereferenceable
 				//SFINAE ! REMPLACER PAR MES IMPLEMENTATIONS !
 			{
-				if (first > last)
+				difference_type diff = std::distance(first, last);
+				if (diff < 0)
 					throw std::length_error("vector::assign");
 
 				//Destroy all previous elements held in the container
 				clear();
 
 				//Reallocate storage space if necessary
-				size_type nb_elements = static_cast<size_type>(last - first);
+				size_type nb_elements = static_cast<size_type>(diff);
 				if (nb_elements > _capacity)
 				{
 					//Deallocate existing storage space
@@ -396,7 +401,7 @@ namespace ft
 			//Single element
 			iterator insert (iterator position, const value_type& val)
 			{
-				size_type insert_index =  static_cast<size_type>(position - _start);
+				size_type insert_index =  static_cast<size_type>(position - begin());
 				insert(position, 1, val);
 				return iterator(_start + insert_index);
 			}
@@ -409,7 +414,7 @@ namespace ft
 				if (n > max_size() - _size || position < begin() || position > end())
 					throw std::length_error("vector::insert");
 
-				size_type insert_index =  static_cast<size_type>(position - _start);
+				size_type insert_index =  static_cast<size_type>(position - begin());
 
 				//Reallocation if new vector size surpasses the current vector capacity
 				if (_size + n > _capacity)
@@ -417,15 +422,15 @@ namespace ft
 					pointer new_start = _alloc.allocate(_size + n); //ALLOUER PLUS ?!
 					
 					//Reconstruct elements in new array up until the insert_index
-					for (size_type i = 0; i < (insert_index - 1); i++)
+					for (size_type i = 0; i < insert_index; i++)
 					{
 						_alloc.construct(new_start + i, *(_start + i));
 						_alloc.destroy(_start + i);
 					}
 
-					//Move all elemets after insert_index + n to their old position + n
+					//Move all elements after insert_index + n to their old position + n
 					size_type end_of_insert_index = insert_index + n; //where the insertion stops, which is the new beginning index for the displaced elements
-					for (size_type i = end_of_insert_index; i < (end_of_insert_index + n); i++)
+					for (size_type i = end_of_insert_index; i < (_size + n) && _start != 0; i++)
 					{
 							_alloc.construct(new_start + i, *(_start + i - n));
 							_alloc.destroy(_start + i - n);
@@ -443,9 +448,9 @@ namespace ft
 				//If no reallocation necessary, directly displace elements and insert n copies of val
 				else
 				{
-					//Move all elemets after insert_index + n to their old position + n
+					//Move all elements after insert_index + n to their old position + n
 					size_type end_of_insert_index = insert_index + n; //where the insertion stops, which is the new beginning index for the displaced elements
-					for (size_type i = end_of_insert_index; i < (end_of_insert_index + n); i++)
+					for (size_type i = end_of_insert_index; i < (_size + n) && _start != 0; i++)
 					{
 							_alloc.construct(_start + i, *(_start + i - n));
 							_alloc.destroy(_start + i - n);
@@ -467,11 +472,12 @@ namespace ft
 				typename std::enable_if< ! std::is_integral<InputIterator>::value >::type* = 0) //disable this overload if enable_if condition not statisfied. Arugments must be dereferenceable) 
 			//SFINAE ! REMPLACER PAR MES IMPLEMENTATIONS !
 			{
-				if (first > last || position < begin() || position > end())
+				difference_type diff = std::distance(first, last);
+				if (diff < 0 || position < begin() || position > end())
 					throw std::length_error("vector::insert");
 
-				size_type n = static_cast<size_type>(last - first);
-				size_type insert_index =  static_cast<size_type>(position - _start);
+				size_type n = static_cast<size_type>(diff);
+				size_type insert_index =  static_cast<size_type>(position - begin());
 
 				//Reallocation if new vector size surpasses the current vector capacity
 				if (_size + n > _capacity)
@@ -479,23 +485,23 @@ namespace ft
 					pointer new_start = _alloc.allocate(_size + n); //ALLOUER PLUS ?!
 					
 					//Reconstruct elements in new array up until the insert_index
-					for (size_type i = 0; i < (insert_index - 1); i++)
+					for (size_type i = 0; i < insert_index; i++)
 					{
 						_alloc.construct(new_start + i, *(_start + i));
 						_alloc.destroy(_start + i);
 					}
 
-					//Move all elemets after insert_index + n to their old position + n
+					//Move all elements after insert_index + n to their old position + n
 					size_type end_of_insert_index = insert_index + n; //where the insertion stops, which is the new beginning index for the displaced elements
-					for (size_type i = end_of_insert_index; i < (end_of_insert_index + n); i++)
+					for (size_type i = end_of_insert_index; i < (_size + n); i++)
 					{
 							_alloc.construct(new_start + i, *(_start + i - n));
 							_alloc.destroy(_start + i - n);
 					}
 					
 					//Insert the n new elements copied from the range starting at insert_index
-					for (size_type i = insert_index, j = 0; i < end_of_insert_index; i++, j++)
-						_alloc.construct(new_start + i, *(first + j));
+					for (size_type i = insert_index; i < end_of_insert_index; i++, first++)
+						_alloc.construct(new_start + i, *first);
 
 					_alloc.deallocate(_start, _capacity);
 					_start = new_start;
@@ -505,17 +511,17 @@ namespace ft
 				//If no reallocation necessary, directly displace elements and insert n copies of val
 				else
 				{
-					//Move all elemets after insert_index + n to their old position + n
+					//Move all elements after insert_index + n to their old position + n
 					size_type end_of_insert_index = insert_index + n; //where the insertion stops, which is the new beginning index for the displaced elements
-					for (size_type i = end_of_insert_index; i < (end_of_insert_index + n); i++)
+					for (size_type i = end_of_insert_index; i < (_size + n); i++)
 					{
 							_alloc.construct(_start + i, *(_start + i - n));
 							_alloc.destroy(_start + i - n);
 					}
 					
 					//Insert the n new elements copied from the range starting at insert_index
-					for (size_type i = insert_index, j = 0; i < end_of_insert_index; i++, j++)
-						_alloc.construct(_start + i, *(first + j));
+					for (size_type i = insert_index; i < end_of_insert_index; i++, first++)
+						_alloc.construct(_start + i, *first);
 
 					_size += n;
 				}
@@ -524,7 +530,7 @@ namespace ft
 			//Removes from the vector a single element
 			iterator erase (iterator position)
 			{
-				size_type erase_index =  static_cast<size_type>(position - _start);
+				size_type erase_index =  static_cast<size_type>(std::distance(begin(), position));
 
 				//Move all elements one index to the left
 				for (size_type i = erase_index; i < _size - 1; i++) //s'arrete au bon indice ?!
@@ -541,15 +547,19 @@ namespace ft
 			iterator erase (iterator first, iterator last)
 			{
 				
-				size_type n =  static_cast<size_type>(last - first);
-				size_type erase_index =  static_cast<size_type>(first - _start);
+				size_type n =  static_cast<size_type>(std::distance(first, last));
+				size_type erase_index =  static_cast<size_type>(std::distance(begin(), first));
 
-				//Move all elements n indices to the left
-				for (size_type i = erase_index; i < _size - n - 1; i++) //s'arrete au bon indice ?!
-				{
+				//Destroy elements in range
+				for (size_type i = erase_index; i < erase_index + n; i++)
 					_alloc.destroy(_start + i);
-					_alloc.construct(_start + i, *(_start + n + i));
-					_alloc.destroy(_start + n + i);
+
+				//Move all elements n indices to the left, starting from the element at the end of the range
+				for (size_type i = erase_index + n; i < _size; i++)
+				{
+					// value_type test =  *(_start + i);
+					_alloc.construct(_start + i - n, *(_start + i));
+					_alloc.destroy(_start + i);
 				}
 
 				_size -= n;
