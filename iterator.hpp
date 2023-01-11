@@ -6,7 +6,7 @@
 /*   By: vfiszbin <vfiszbin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/11 09:49:47 by vfiszbin          #+#    #+#             */
-/*   Updated: 2023/01/11 13:17:32 by vfiszbin         ###   ########.fr       */
+/*   Updated: 2023/01/11 16:28:05 by vfiszbin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,33 +27,38 @@ namespace ft
 	template <class Iterator>
 	class iterator_traits
 	{
-		typedef typename Iterator::difference_type difference_type;
-		typedef typename Iterator::value_type value_type;
-		typedef typename Iterator::pointer pointer;
-		typedef typename Iterator::reference reference;
-		typedef typename Iterator::iterator_category iterator_category;
+		public:
+			typedef typename Iterator::difference_type difference_type;
+			typedef typename Iterator::value_type value_type;
+			typedef typename Iterator::pointer pointer;
+			typedef typename Iterator::reference reference;
+			typedef typename Iterator::iterator_category iterator_category;
 	};
+
+	class random_access_iterator_tag { }; //empty class to identify this type of iterator
 	
 	//Specialization for pointers
 	template <class T>
 	class iterator_traits<T*>
 	{
-        typedef std::ptrdiff_t difference_type;
-        typedef T value_type;
-        typedef T* pointer;
-        typedef T& reference;
-        typedef std::random_access_iterator_tag iterator_category;
+		public:
+			typedef std::ptrdiff_t difference_type;
+			typedef T value_type;
+			typedef T* pointer;
+			typedef T& reference;
+			typedef ft::random_access_iterator_tag iterator_category;
 	};
 	
 	//Specialization for const pointers
 	template <class T>
 	class iterator_traits<const T*>
 	{
-        typedef std::ptrdiff_t difference_type;
-        typedef T value_type;
-        typedef const T* pointer;
-        typedef const T& reference;
-        typedef std::random_access_iterator_tag iterator_category;
+		public:
+			typedef std::ptrdiff_t difference_type;
+			typedef T value_type;
+			typedef const T* pointer;
+			typedef const T& reference;
+			typedef ft::random_access_iterator_tag iterator_category;
 	};
 
 
@@ -65,29 +70,40 @@ namespace ft
 	template <class Category, class T, class Distance = std::ptrdiff_t, class Pointer = T*, class Reference = T&>
   	class iterator 
 	{
-		typedef T value_type;
-		typedef Distance difference_type;
-		typedef Pointer pointer;
-		typedef Reference reference;
-		typedef Category iterator_category;
+		public:
+			typedef T value_type;
+			typedef Distance difference_type;
+			typedef Pointer pointer;
+			typedef Reference reference;
+			typedef Category iterator_category;
   };
+
+  
 	
 	/// RANDOM ACCESS ITERATOR ///
 
 	//Random-access iterators are iterators that can be used to access elements at an arbitrary offset position relative to the element they point to,
 	//offering the same functionality as pointers.
 	template<typename T>
-	class random_access_iterator : iterator<std::random_access_iterator_tag, T>
+	class random_access_iterator : iterator<ft::random_access_iterator_tag, T>
 	{
 		public:
-			//BESOIN DE REDEFINIR LES TYPEDEF OU HERITES ?!
-			
+                typedef typename ft::iterator<ft::random_access_iterator_tag, T>::value_type value_type;
+                typedef typename ft::iterator<ft::random_access_iterator_tag, T>::difference_type difference_type;
+                typedef typename ft::iterator<ft::random_access_iterator_tag, T>::pointer pointer;
+                typedef typename ft::iterator<ft::random_access_iterator_tag, T>::reference reference;
+                // typedef typename ft::iterator<ft::random_access_iterator_tag, T>::iterator_category iterator_category;
+				typedef	std::random_access_iterator_tag iterator_category;
+
 			///------------------///
 			/// MEMBER FUNCTIONS ///
 			///------------------///
 			
-			//Default cosntructor
+			//Default constructor
 			random_access_iterator() : _ptr(0) {}
+
+			//Constructor from pointer
+			random_access_iterator(pointer p) : _ptr(p) {}
 
 			//Copy constructor
 			random_access_iterator(const random_access_iterator& r) : _ptr(r._ptr) {}
@@ -186,6 +202,10 @@ namespace ft
 			{
 				return *(_ptr + n);
 			}
+
+			//Convert to constant iterator
+			operator random_access_iterator<const T> () const
+                { return (random_access_iterator<const T>(_ptr)); }
 			
 		private:
 			pointer _ptr; //the pointer around which the iterator (wrapper) is built
@@ -226,14 +246,14 @@ namespace ft
 
 	//Arithmetic operator + with another iterator
 	template <typename L, typename R>
-    bool operator+(const random_access_iterator<L> lhs, const random_access_iterator<R> rhs)
+    typename random_access_iterator<L>::difference_type operator+(const random_access_iterator<L> lhs, const random_access_iterator<R> rhs)
     {
         return &(*lhs) + &(*rhs); //&(*lhs) get the underlying pointer of iterator lhs
     }
 
 	//Arithmetic operator - with another iterator
 	template <typename L, typename R>
-    bool operator-(const random_access_iterator<L> lhs, const random_access_iterator<R> rhs)
+    typename random_access_iterator<L>::difference_type operator-(const random_access_iterator<L> lhs, const random_access_iterator<R> rhs)
     {
         return &(*lhs) - &(*rhs); //&(*lhs) get the underlying pointer of iterator lhs
     }
