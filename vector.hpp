@@ -6,7 +6,7 @@
 /*   By: vfiszbin <vfiszbin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/11 09:28:35 by vfiszbin          #+#    #+#             */
-/*   Updated: 2023/01/11 09:28:46 by vfiszbin         ###   ########.fr       */
+/*   Updated: 2023/01/12 11:17:59 by vfiszbin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,9 +14,9 @@
 # define VECTOR_HPP
 
 # include <memory>
-# include <vector> //RETIRER !!!
 # include <stdexcept>
-# include <type_traits> //RETIRER !!!
+# include "iterator.hpp"
+# include "utils.hpp"
 
 
 namespace ft
@@ -34,10 +34,11 @@ namespace ft
 			typedef typename allocator_type::const_reference const_reference;
 			typedef typename allocator_type::pointer pointer;
 			typedef typename allocator_type::const_pointer const_pointer;
-			typedef typename std::vector<value_type>::iterator iterator; //Mettre mon propre iterator !
-			typedef typename std::vector<value_type>::const_iterator const_iterator; //Mettre mon propre iterator !
-			typedef typename std::vector<value_type>::reverse_iterator reverse_iterator; //Mettre mon propre iterator !
-			typedef typename std::vector<value_type>::const_reverse_iterator const_reverse_iterator; //Mettre mon propre iterator !
+			typedef ft::random_access_iterator<value_type> iterator;
+			typedef ft::random_access_iterator<const value_type> const_iterator;
+			typedef ft::reverse_iterator<iterator> reverse_iterator;
+			typedef ft::reverse_iterator<const_iterator> const_reverse_iterator;
+
 			typedef std::ptrdiff_t difference_type; //can represent the number of element between two pointers
 			typedef std::size_t size_type;
 
@@ -63,8 +64,7 @@ namespace ft
 			//Range constructor
 			//Constructs a container with as many elements as the range [first,last), with each element constructed from its corresponding element in that range, in the same order.
 			template <class InputIterator> vector (InputIterator first, InputIterator last, const allocator_type& alloc = allocator_type(),
-				typename std::enable_if< ! std::is_integral<InputIterator>::value >::type* = 0) //disable this overload if enable_if condition not statisfied. Arugments must be dereferenceable) 
-			//SFINAE ! REMPLACER PAR MES IMPLEMENTATIONS !
+				typename ft::enable_if< ! ft::is_integral<InputIterator>::value >::type* = 0) //disable this overload if enable_if condition not statisfied. Arugments must be dereferenceable) 
 			{
 				difference_type diff = std::distance(first, last);
 				if (diff < 0)
@@ -335,9 +335,8 @@ namespace ft
 			//In the range version, the new contents are elements constructed from each of the elements in the range between first and last, in the same order.
 			template <class InputIterator>  
 			void assign (InputIterator first, InputIterator last,
-				typename std::enable_if< ! std::is_integral<InputIterator>::value >::type* = 0) //disable this overload if enable_if condition not statisfied. Arugments must be dereferenceable
-				//SFINAE ! REMPLACER PAR MES IMPLEMENTATIONS !
-			{
+				typename ft::enable_if< ! ft::is_integral<InputIterator>::value >::type* = 0) //disable this overload if enable_if condition not statisfied. Arugments must be dereferenceable
+			{				
 				difference_type diff = std::distance(first, last);
 				if (diff < 0)
 					throw std::length_error("vector::assign");
@@ -355,7 +354,7 @@ namespace ft
 					_capacity = nb_elements;
 				}
 				//Construct with new elements
-				for (size_type i = 0; first != last; i++, first++) //iteration ok ?
+				for (size_type i = 0; first != last; i++, first++)
 					_alloc.construct(_start + i, *first);
 
 				_size = nb_elements;
@@ -481,8 +480,7 @@ namespace ft
 			//Range
 			template <class InputIterator>    
 			void insert (iterator position, InputIterator first, InputIterator last,
-				typename std::enable_if< ! std::is_integral<InputIterator>::value >::type* = 0) //disable this overload if enable_if condition not statisfied. Arugments must be dereferenceable) 
-			//SFINAE ! REMPLACER PAR MES IMPLEMENTATIONS !
+				typename ft::enable_if< ! ft::is_integral<InputIterator>::value >::type* = 0) //disable this overload if enable_if condition not statisfied. Arugments must be dereferenceable) 
 			{
 				difference_type diff = std::distance(first, last);
 				if (diff < 0 || position < begin() || position > end())
@@ -545,7 +543,7 @@ namespace ft
 				size_type erase_index =  static_cast<size_type>(std::distance(begin(), position));
 
 				//Move all elements one index to the left
-				for (size_type i = erase_index; i < _size - 1; i++) //s'arrete au bon indice ?!
+				for (size_type i = erase_index; i < _size - 1; i++)
 				{
 					_alloc.construct(_start + i, *(_start + i + 1));
 					_alloc.destroy(_start + i + 1);
@@ -639,7 +637,7 @@ namespace ft
 	template <class T, class Alloc>
 	bool operator<  (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
 	{
-		return std::lexicographical_compare( lhs.begin(), lhs.end(), rhs.begin(), rhs.end() ); //CHANGER POUR MON FT LEXICO COMPARE !!!
+		return ft::lexicographical_compare( lhs.begin(), lhs.end(), rhs.begin(), rhs.end() );
 	}
 
 	template <class T, class Alloc>
