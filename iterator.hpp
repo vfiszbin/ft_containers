@@ -6,7 +6,7 @@
 /*   By: vfiszbin <vfiszbin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/11 09:49:47 by vfiszbin          #+#    #+#             */
-/*   Updated: 2023/01/11 20:03:26 by vfiszbin         ###   ########.fr       */
+/*   Updated: 2023/01/12 08:46:33 by vfiszbin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -132,7 +132,7 @@ namespace ft
 			}
 
 			//Return lvalue (assignable) to pointer 
-			reference operator->() const
+			pointer operator->() const
 			{
 				return _ptr;
 			}
@@ -511,7 +511,13 @@ namespace ft
 	template <class Iterator>
 	typename reverse_iterator<Iterator>::difference_type operator- (const reverse_iterator<Iterator>& lhs, const reverse_iterator<Iterator>& rhs)
 	{
-		return lhs.base() - rhs.base();
+		return rhs.base() - lhs.base();
+	}
+	//For comparison between const and non-const
+	template <class L, class R>
+	typename reverse_iterator<L>::difference_type operator- (const reverse_iterator<L>& lhs, const reverse_iterator<R>& rhs)
+	{
+		return rhs.base() - lhs.base();
 	}
 
 }
