@@ -6,18 +6,18 @@
 /*   By: vfiszbin <vfiszbin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/11 09:28:40 by vfiszbin          #+#    #+#             */
-/*   Updated: 2023/01/11 09:28:44 by vfiszbin         ###   ########.fr       */
+/*   Updated: 2023/01/12 08:51:46 by vfiszbin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-# include <vector> //ENLEVER !
+#ifndef STACK_HPP
+# define STACK_HPP
 
-#ifndef VECTOR_HPP
-# define VECTOR_HPP
+# include "vector.hpp"
 
 namespace ft
 {
-	template < class T, class Container = std::vector<T> > //mon vector par DEFAUT !!!
+	template < class T, class Container = ft::vector<T> >
 	class stack
 	{
 		public:
