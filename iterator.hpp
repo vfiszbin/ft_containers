@@ -6,7 +6,7 @@
 /*   By: vfiszbin <vfiszbin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/11 09:49:47 by vfiszbin          #+#    #+#             */
-/*   Updated: 2023/01/12 08:46:33 by vfiszbin         ###   ########.fr       */
+/*   Updated: 2023/01/13 19:05:03 by vfiszbin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 # define ITERATOR_HPP
 
 # include <cstddef>
+# include "avl_tree.hpp"
 
 namespace ft
 {
@@ -36,6 +37,7 @@ namespace ft
 	};
 
 	class random_access_iterator_tag { }; //empty class to identify this type of iterator
+	class bidirectional_iterator_tag{ }; //empty class to identify this type of iterator
 	
 	//Specialization for pointers
 	template <class T>
@@ -518,6 +520,153 @@ namespace ft
 	typename reverse_iterator<L>::difference_type operator- (const reverse_iterator<L>& lhs, const reverse_iterator<R>& rhs)
 	{
 		return rhs.base() - lhs.base();
+	}
+
+
+	/// AVL TREE ITERATOR ///
+	
+	template <typename T >
+	class avl_tree_iterator : ft::iterator<ft::bidirectional_iterator_tag, T>
+	{
+		public:
+			typedef typename T::value_type    value_type;
+			typedef typename ft::iterator<ft::bidirectional_iterator_tag, value_type>::difference_type   difference_type;
+			typedef T* pointer;
+			typedef typename ft::iterator<ft::bidirectional_iterator_tag, value_type>::reference reference;
+			typedef typename ft::iterator<ft::bidirectional_iterator_tag, value_type>::iterator_category iterator_category;
+
+			///------------------///
+			/// MEMBER FUNCTIONS ///
+			///------------------///
+
+			//Default constructor
+			avl_tree_iterator() : _ptr(0) {}
+
+			//Constructor from pointer
+			avl_tree_iterator(T* p) : _ptr(p) {}
+
+			//Copy constructor
+			avl_tree_iterator(const avl_tree_iterator& r) : _ptr(r._ptr) {}
+			
+			//Assignment operator overload
+			avl_tree_iterator& operator=(const avl_tree_iterator& r)
+            {
+				if (this == &r)
+					return *this;
+
+				_ptr = r._ptr;
+				return *this;
+            }
+			
+			//Destructor
+			virtual ~avl_tree_iterator() {}
+			
+			//Dereference, return rvalue (non assignable) pointed to by pointer
+			reference operator*() const
+			{
+				return _ptr->value;
+			}
+
+			//Return lvalue (assignable) to pointer 
+			pointer operator->() const
+			{
+				return &(_ptr->value);
+			}
+
+			//Prefix increment
+			avl_tree_iterator& operator++()
+            {
+                if (_ptr->right)
+					_ptr = minValueNode(_ptr->right);
+				else
+				{
+					pointer p = _ptr->parent;
+					while (p != NULL && _ptr == p->right)
+					{
+						_ptr = p;
+						p = p->parent;
+					}
+					_ptr = p;
+				}
+                return *this;
+            }
+
+			//Postfix increment
+			//Takes int argument to differentiate pre and postfix
+			//Increments pointer but return non-incremented copy of the instance
+			avl_tree_iterator operator++(int)
+			{
+				avl_tree_iterator cpy(*this);
+				operator++();
+				return cpy;
+			}
+
+			//Prefix decrement
+			avl_tree_iterator& operator--()
+            {
+                if (_ptr->left)
+					_ptr = maxValueNode(_ptr->left);
+				else
+				{
+					pointer p = _ptr->parent;
+					while (p != NULL && _ptr == p->left)
+					{
+						_ptr = p;
+						p = p->parent;
+					}
+					_ptr = p;
+				}
+                return *this;
+            }
+
+			//Postfix decrement
+			//Takes int argument to differentiate pre and postfix
+			//Decrements pointer but return non-decremented copy of the instance
+			avl_tree_iterator operator--(int)
+			{
+				avl_tree_iterator cpy(*this);
+				operator--();
+				return cpy;
+			}
+
+		private:
+			pointer _ptr;
+
+
+			pointer minValueNode(pointer node) 
+			{
+				pointer current = node;
+				/* loop down to find the leftmost leaf */
+				while (current->left != NULL) 
+				{
+					current = current->left;
+				}
+				return current;
+			}
+
+			pointer maxValueNode(pointer node) 
+			{
+				pointer current = node;
+				/* loop down to find the rightmost leaf */
+				while (current->right != NULL) 
+				{
+					current = current->right;
+				}
+				return current;
+			}
+			
+	};
+
+	template<typename L, typename R>
+	bool operator==(const avl_tree_iterator<L> & lhs, const avl_tree_iterator<R> & rhs)
+	{
+			return &(*lhs) == &(*rhs);
+	}
+
+	template<typename L, typename R>
+	bool operator!=(const avl_tree_iterator<L> & lhs, const avl_tree_iterator<R> & rhs)
+	{
+			return &(*lhs) != &(*rhs);
 	}
 
 }
