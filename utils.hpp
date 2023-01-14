@@ -6,7 +6,7 @@
 /*   By: vfiszbin <vfiszbin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/12 09:18:25 by vfiszbin          #+#    #+#             */
-/*   Updated: 2023/01/13 08:53:56 by vfiszbin         ###   ########.fr       */
+/*   Updated: 2023/01/14 18:25:36 by vfiszbin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -180,6 +180,9 @@ namespace ft
 		template<class U, class V>
 		pair (const pair<U,V>& pr) : first(pr.first), second(pr.second) {}
 
+		//Copy constructor
+		pair(const pair & pr) : first(pr.first), second(pr.second) {}
+
 		//Initialization constructor
 		pair (const first_type& a, const second_type& b) : first(a), second(b) {}
 
@@ -238,6 +241,22 @@ namespace ft
 		
 		return pair<T1,T2>(x,y);
   	}
+
+	//Choose template mechanism to choose between const and non-const version of a typedef
+	template <bool flag, class IsTrue, class IsFalse>
+	struct choose;
+
+	template <class IsTrue, class IsFalse>
+	struct choose<true, IsTrue, IsFalse> 
+	{
+		typedef IsTrue type;
+	};
+
+	template <class IsTrue, class IsFalse>
+	struct choose<false, IsTrue, IsFalse> 
+	{
+		typedef IsFalse type;
+	};
 	
 }
 

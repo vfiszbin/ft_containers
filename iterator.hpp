@@ -6,7 +6,7 @@
 /*   By: vfiszbin <vfiszbin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/11 09:49:47 by vfiszbin          #+#    #+#             */
-/*   Updated: 2023/01/13 19:05:03 by vfiszbin         ###   ########.fr       */
+/*   Updated: 2023/01/14 19:58:03 by vfiszbin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -525,15 +525,20 @@ namespace ft
 
 	/// AVL TREE ITERATOR ///
 	
-	template <typename T >
+	template <typename T, bool is_const>
 	class avl_tree_iterator : ft::iterator<ft::bidirectional_iterator_tag, T>
 	{
 		public:
-			typedef typename T::value_type    value_type;
+			typedef typename T::value_type value_type; //value inside the node
+			typedef T* node_pointer; //pointer to the node
 			typedef typename ft::iterator<ft::bidirectional_iterator_tag, value_type>::difference_type   difference_type;
-			typedef T* pointer;
-			typedef typename ft::iterator<ft::bidirectional_iterator_tag, value_type>::reference reference;
 			typedef typename ft::iterator<ft::bidirectional_iterator_tag, value_type>::iterator_category iterator_category;
+			
+			//Choose template mechanism to choose between const and non-const version of a typedef
+			// typedef typename ft::iterator<ft::bidirectional_iterator_tag, value_type>::pointer pointer; //CHANGER ? !!!
+			// typedef typename ft::iterator<ft::bidirectional_iterator_tag, value_type>::reference reference;
+			typedef typename choose<is_const, const value_type &, value_type &>::type reference;
+			typedef typename choose<is_const, const value_type *, value_type *>::type pointer;
 
 			///------------------///
 			/// MEMBER FUNCTIONS ///
@@ -543,7 +548,7 @@ namespace ft
 			avl_tree_iterator() : _ptr(0) {}
 
 			//Constructor from pointer
-			avl_tree_iterator(T* p) : _ptr(p) {}
+			avl_tree_iterator(node_pointer p) : _ptr(p) {}
 
 			//Copy constructor
 			avl_tree_iterator(const avl_tree_iterator& r) : _ptr(r._ptr) {}
@@ -580,7 +585,7 @@ namespace ft
 					_ptr = minValueNode(_ptr->right);
 				else
 				{
-					pointer p = _ptr->parent;
+					node_pointer p = _ptr->parent;
 					while (p != NULL && _ptr == p->right)
 					{
 						_ptr = p;
@@ -608,7 +613,7 @@ namespace ft
 					_ptr = maxValueNode(_ptr->left);
 				else
 				{
-					pointer p = _ptr->parent;
+					node_pointer p = _ptr->parent;
 					while (p != NULL && _ptr == p->left)
 					{
 						_ptr = p;
@@ -629,13 +634,17 @@ namespace ft
 				return cpy;
 			}
 
+			//Convert to constant iterator   UTILE ? !!!
+			template<bool B>
+			operator avl_tree_iterator<const T, B> () const
+                { return avl_tree_iterator<const T, B>(_ptr); }
+
 		private:
-			pointer _ptr;
+			node_pointer _ptr;
 
-
-			pointer minValueNode(pointer node) 
+			node_pointer minValueNode(node_pointer node) 
 			{
-				pointer current = node;
+				node_pointer current = node;
 				/* loop down to find the leftmost leaf */
 				while (current->left != NULL) 
 				{
@@ -644,9 +653,9 @@ namespace ft
 				return current;
 			}
 
-			pointer maxValueNode(pointer node) 
+			node_pointer maxValueNode(node_pointer node) 
 			{
-				pointer current = node;
+				node_pointer current = node;
 				/* loop down to find the rightmost leaf */
 				while (current->right != NULL) 
 				{
@@ -654,21 +663,20 @@ namespace ft
 				}
 				return current;
 			}
+				
 			
 	};
 
-	template<typename L, typename R>
-	bool operator==(const avl_tree_iterator<L> & lhs, const avl_tree_iterator<R> & rhs)
+	template<typename L, typename R, bool B_L, bool B_R>
+	bool operator==(const avl_tree_iterator<L, B_L> & lhs, const avl_tree_iterator<R, B_R> & rhs)
 	{
 			return &(*lhs) == &(*rhs);
 	}
-
-	template<typename L, typename R>
-	bool operator!=(const avl_tree_iterator<L> & lhs, const avl_tree_iterator<R> & rhs)
+	template<typename L, typename R, bool B_L, bool B_R>
+	bool operator!=(const avl_tree_iterator<L, B_L> & lhs, const avl_tree_iterator<R, B_R> & rhs)
 	{
 			return &(*lhs) != &(*rhs);
 	}
-
 }
 
 #endif

@@ -6,7 +6,7 @@
 /*   By: vfiszbin <vfiszbin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/11 09:28:35 by vfiszbin          #+#    #+#             */
-/*   Updated: 2023/01/12 11:17:59 by vfiszbin         ###   ########.fr       */
+/*   Updated: 2023/01/14 16:07:14 by vfiszbin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,7 @@ namespace ft
 			///---------------///
 			/// MEMBER TYPES ///
 			///---------------///
-			typedef T value_type;
+			typedef T::value_type value_type;
 			typedef Alloc allocator_type;
 			typedef typename allocator_type::reference reference;
 			typedef typename allocator_type::const_reference const_reference;
@@ -64,7 +64,7 @@ namespace ft
 			//Range constructor
 			//Constructs a container with as many elements as the range [first,last), with each element constructed from its corresponding element in that range, in the same order.
 			template <class InputIterator> vector (InputIterator first, InputIterator last, const allocator_type& alloc = allocator_type(),
-				typename ft::enable_if< ! ft::is_integral<InputIterator>::value >::type* = 0) //disable this overload if enable_if condition not statisfied. Arugments must be dereferenceable) 
+				typename ft::enable_if< ! ft::is_integral<InputIterator>::value >::type* = 0) //disable this overload if enable_if condition not statisfied. Arguments must be dereferenceable) 
 			{
 				difference_type diff = std::distance(first, last);
 				if (diff < 0)
@@ -335,7 +335,7 @@ namespace ft
 			//In the range version, the new contents are elements constructed from each of the elements in the range between first and last, in the same order.
 			template <class InputIterator>  
 			void assign (InputIterator first, InputIterator last,
-				typename ft::enable_if< ! ft::is_integral<InputIterator>::value >::type* = 0) //disable this overload if enable_if condition not statisfied. Arugments must be dereferenceable
+				typename ft::enable_if< ! ft::is_integral<InputIterator>::value >::type* = 0) //disable this overload if enable_if condition not statisfied. Arguments must be dereferenceable
 			{				
 				difference_type diff = std::distance(first, last);
 				if (diff < 0)
@@ -480,7 +480,7 @@ namespace ft
 			//Range
 			template <class InputIterator>    
 			void insert (iterator position, InputIterator first, InputIterator last,
-				typename ft::enable_if< ! ft::is_integral<InputIterator>::value >::type* = 0) //disable this overload if enable_if condition not statisfied. Arugments must be dereferenceable) 
+				typename ft::enable_if< ! ft::is_integral<InputIterator>::value >::type* = 0) //disable this overload if enable_if condition not statisfied. Arguments must be dereferenceable) 
 			{
 				difference_type diff = std::distance(first, last);
 				if (diff < 0 || position < begin() || position > end())
