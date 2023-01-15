@@ -6,7 +6,7 @@
 /*   By: vfiszbin <vfiszbin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/12 16:02:00 by vfiszbin          #+#    #+#             */
-/*   Updated: 2023/01/15 13:02:54 by vfiszbin         ###   ########.fr       */
+/*   Updated: 2023/01/15 17:38:23 by vfiszbin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,7 @@
 #define SPACE 10 //REMOVE !!!
 # include "utils.hpp"
 # include <memory>
+// #include <cstring> //!!!
 
 namespace ft
 {
@@ -236,7 +237,7 @@ namespace ft
 			{
 				node_type * current = node;
 				//loop down to find the leftmost leaf
-				while (current->left != NULL) 
+				while (current && current->left != NULL) 
 				{
 					current = current->left;
 				}
@@ -247,7 +248,7 @@ namespace ft
 			{
 				node_type * current = node;
 				//loop down to find the rightmost leaf
-				while (current->right != NULL) 
+				while (current && current->right != NULL) 
 				{
 					current = current->right;
 				}
@@ -305,33 +306,31 @@ namespace ft
 						node_type * temp = minValueNode(r->right);
 						
 						//copy the inorder successor's content to the current node 
-						r->value = temp->value;
-
-						// node_type* new_r = _alloc.allocate(1);
-						// _alloc.construct(new_r, temp->value);
-						// new_r->parent = r->parent;
-						// new_r->left = r->left;
-						// new_r->right = r->right;
-						
-						// if (r->left)
-						// 	r->left->parent = new_r;
-						// if (r->right)
-						// 	r->right->parent = new_r;
-						// if (r->parent)
-						// {
-						// 	if (r->parent->left == r)
-						// 		r->parent->left = new_r;
-						// 	else
-						// 		r->parent->right = new_r;
-						// }
-						// _alloc.destroy(r);
-						// _alloc.deallocate(r, 1);
-						// r = new_r;
+						// r->value = temp->value;
 
 						//delete the inorder successor 
-						r->right = deleteNode(r->right, temp->value);
-						if (r->right != NULL)
-							r->right->parent = r;
+						// r->right = deleteNode(r->right, temp->value);
+						r->right = replaceNode(r->right, temp->value);
+						
+						temp->parent = r->parent;
+						temp->left = r->left;
+						temp->right = r->right;
+						if (r->left)
+							r->left->parent = temp;
+						if (r->right)
+							r->right->parent = temp;
+						if (r->parent)
+						{
+							if (r->parent->left == r)
+								r->parent->left = temp;
+							else
+								r->parent->right = temp;
+						}
+						// if (r == root)
+						// 	root = temp;
+						_alloc.destroy(r);
+						_alloc.deallocate(r, 1);
+						r = temp;
 					}
 				}
 
@@ -359,6 +358,54 @@ namespace ft
 
 				return r;
 			}
+			
+
+			node_type * replaceNode(node_type * r, T k)
+			{
+				//Base case : no node with key k was found
+				if (r == NULL) 
+				{
+					return NULL;
+				}
+				//If the key to be deleted is smaller than the current node's key, 
+				//then it must be in the left subtree 
+				else if (k < r->value) 
+				{
+					r->left = replaceNode(r->left, k);
+					if (r->left != NULL)
+						r->left->parent = r;
+				}
+				//If the key to be deleted is greater than the current node's key, 
+				//then it must be in the right subtree 
+				else if (k > r->value) 
+				{
+					r->right = replaceNode(r->right, k);
+					if (r->right != NULL)
+						r->right->parent = r;
+				}
+				//If the key is same as current node's key, then the current node is the one to delete
+				else 
+				{
+					//node with only one child or no child 
+					if (r->left == NULL) 
+					{
+						node_type * temp = r->right;
+						// _alloc.destroy(r);
+						// _alloc.deallocate(r, 1);
+						return temp; //return the child to link it with the deleted node's parent
+					} 
+					else if (r->right == NULL) 
+					{
+						node_type * temp = r->left;
+						// _alloc.destroy(r);
+						// _alloc.deallocate(r, 1);
+						return temp; //return the child to link it with the deleted node's parent
+					} 
+				}
+				return r;
+			}
+
+
 
 			void print2D(node_type * r, int space) {
 				if (r == NULL) // Base case  1

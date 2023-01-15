@@ -248,6 +248,7 @@ namespace ft
 			{
 				while (first != last)
 					erase(first++);
+					
 			}
 
 			//Exchanges the content of the container by the content of x, which is another map of the same type

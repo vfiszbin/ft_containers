@@ -6,7 +6,7 @@
 /*   By: vfiszbin <vfiszbin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/12 09:18:25 by vfiszbin          #+#    #+#             */
-/*   Updated: 2023/01/15 12:51:39 by vfiszbin         ###   ########.fr       */
+/*   Updated: 2023/01/15 14:17:12 by vfiszbin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -162,7 +162,7 @@ namespace ft
 	{
 		// MEMBER TYPES 
 
-		typedef T1 first_type;
+		typedef typename std::remove_const<T1>::type first_type; //OK DE FAIRE CA ? !!!
 		typedef T2 second_type;
 
 		// MEMBER VARIABLES 
