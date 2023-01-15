@@ -6,7 +6,7 @@
 /*   By: vfiszbin <vfiszbin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/12 16:02:00 by vfiszbin          #+#    #+#             */
-/*   Updated: 2023/01/15 17:38:23 by vfiszbin         ###   ########.fr       */
+/*   Updated: 2023/01/15 19:45:53 by vfiszbin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,12 +48,21 @@ namespace ft
 			typedef TreeNode<T> node_type;
 			typedef Alloc allocator_type;
 			typedef std::size_t size_type;
+			typedef Compare value_compare; //comparison on the first element (key) of the pair only. True if first key inferior.
 
 			node_type* root;
 			//a dummy node used when end() is called in map. Its left child is root so that the -- iterator operator can find the last node
 			node_type* dummy_past_end; 
 			
-			AVLTree(const allocator_type& alloc = allocator_type()) : _alloc(alloc)
+			AVLTree(const allocator_type& alloc = allocator_type()) : _alloc(alloc), _comp(value_compare())
+			{
+				root = NULL;
+				dummy_past_end = _alloc.allocate(1);
+				_alloc.construct(dummy_past_end, T());
+				dummy_past_end->left = root;
+			}
+
+			AVLTree(const value_compare &comp, const allocator_type& alloc = allocator_type()) : _alloc(alloc), _comp(comp)
 			{
 				root = NULL;
 				dummy_past_end = _alloc.allocate(1);
@@ -177,14 +186,14 @@ namespace ft
 					return r;
 				}
 				//If key to insert is inferior to current node key, go left
-				if (new_node->value < r->value) 
+				if (_comp(new_node->value, r->value)) 
 				{
 					r->left = insert(r->left, new_node, inserted, inserted_or_found);
 					if (r->left != NULL)
 						r->left->parent = r;
 				}
 				//If key to insert is superior to current node key, go right
-				else if (new_node->value > r->value) 
+				else if (_comp(r->value, new_node->value)) 
 				{
 					r->right = insert(r->right, new_node, inserted, inserted_or_found);
 					if (r->right != NULL)
@@ -207,22 +216,22 @@ namespace ft
 				
 				int bf = getBalanceFactor(r);
 				//Left Left Case  
-				if (bf > 1 && new_node->value < r->left->value)
+				if (bf > 1 && _comp(new_node->value, r->left->value))
 					return rightRotate(r);
 
 				//Right Right Case  
-				if (bf < -1 && new_node->value > r->right->value)
+				if (bf < -1 && _comp(r->right->value, new_node->value))
 					return leftRotate(r);
 
 				//Left Right Case  
-				if (bf > 1 && new_node->value > r->left->value) 
+				if (bf > 1 && _comp(r->left->value, new_node->value)) 
 				{
 					r->left = leftRotate(r->left);
 					return rightRotate(r);
 				}
 
 				//Right Left Case  
-				if (bf < -1 && new_node->value < r->right->value) 
+				if (bf < -1 && _comp(new_node->value, r->right->value)) 
 				{
 					r->right = rightRotate(r->right);
 					return leftRotate(r);
@@ -268,7 +277,7 @@ namespace ft
 				}
 				//If the key to be deleted is smaller than the current node's key, 
 				//then it must be in the left subtree 
-				else if (k < r->value) 
+				else if (_comp(k, r->value)) 
 				{
 					r->left = deleteNode(r->left, k);
 					if (r->left != NULL)
@@ -276,7 +285,7 @@ namespace ft
 				}
 				//If the key to be deleted is greater than the current node's key, 
 				//then it must be in the right subtree 
-				else if (k > r->value) 
+				else if (_comp(r->value, k)) 
 				{
 					r->right = deleteNode(r->right, k);
 					if (r->right != NULL)
@@ -369,7 +378,7 @@ namespace ft
 				}
 				//If the key to be deleted is smaller than the current node's key, 
 				//then it must be in the left subtree 
-				else if (k < r->value) 
+				else if (_comp(k, r->value)) 
 				{
 					r->left = replaceNode(r->left, k);
 					if (r->left != NULL)
@@ -377,7 +386,7 @@ namespace ft
 				}
 				//If the key to be deleted is greater than the current node's key, 
 				//then it must be in the right subtree 
-				else if (k > r->value) 
+				else if (_comp(r->value, k)) 
 				{
 					r->right = replaceNode(r->right, k);
 					if (r->right != NULL)
@@ -494,18 +503,12 @@ namespace ft
 					node_type * temp = root;
 					while (temp != NULL) 
 					{
-						if (v == temp->value) 
-						{
-							return temp;
-						} 
-						else if (v < temp->value) 
-						{
+						if (_comp(v, temp->value)) 
 							temp = temp->left;
-						} 
-						else 
-						{
+						else if (_comp(temp->value, v)) 
 							temp = temp->right;
-						}
+						else 
+							return temp;
 					}
 				return NULL;
 				}
@@ -551,6 +554,7 @@ namespace ft
 
 		private:
 			allocator_type _alloc;
+			value_compare _comp;
 
 	};
 

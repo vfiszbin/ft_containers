@@ -10,7 +10,7 @@
 
 namespace ft
 {
-	template < class Key, class T, class Compare = std::less<Key>, class Alloc = std::allocator<ft::pair<const Key,T> > >
+	template < class Key, class T, class Compare = std::less<Key>, class Alloc = std::allocator<ft::TreeNode<pair<const Key,T>> > >
 	class map
 	{	
 		public:
@@ -65,14 +65,14 @@ namespace ft
 			///------------------///
 			
 			//Empty constructor
-			explicit map (const key_compare& comp = key_compare(), const allocator_type& alloc = allocator_type()) : _tree(), _comp(comp), _alloc(alloc) {}
+			explicit map (const key_compare& comp = key_compare(), const allocator_type& alloc = allocator_type()) : _tree(tree_type(value_compare(_comp), _alloc)), _comp(comp), _alloc(alloc) {}
 
 			//Range constructor
 			//Constructs a container with as many elements as the range [first,last),
 			//with each element constructed from its corresponding element in that range.
 			template <class InputIterator>
 			map (InputIterator first, InputIterator last, const key_compare& comp = key_compare(), const allocator_type& alloc = allocator_type())
-				: _tree(), _comp(comp), _alloc(alloc) 
+				: _tree(tree_type(value_compare(_comp), _alloc)), _comp(comp), _alloc(alloc) 
 			{
 				insert(first, last); //insert range in maps's tree
 			}
@@ -80,7 +80,7 @@ namespace ft
 			//Copy constructor
 			//Constructs a container with a copy of each of the elements in x.
 			//The copy constructor creates a container that keeps and uses copies of x's allocator and comparison object.
-			map (const map& x) : _tree(), _comp(x._comp), _alloc(x._alloc)
+			map (const map& x) : _tree(tree_type(value_compare(_comp), _alloc)), _comp(x._comp), _alloc(x._alloc)
 			{
 				const_iterator beg = x.begin();
 				insert(x.begin(), x.end()); //FAUT COPIE CHAQUE ELEM DE X !!!
@@ -135,13 +135,13 @@ namespace ft
 			//Returns a reverse iterator pointing to the last element in the container (i.e., its reverse beginning).
 			reverse_iterator rbegin()
 			{
-				return reverse_iterator(_tree.maxValueNode(_tree.root));
+				return reverse_iterator(end());
 			}
 			
 			//Returns a reverse const iterator pointing to the last element in the container (i.e., its reverse beginning).
 			const_reverse_iterator rbegin() const
 			{
-				return const_reverse_iterator(_tree.maxValueNode(_tree.root));
+				return const_reverse_iterator(end());
 			}
 
 			//Returns a reverse iterator pointing to the theoretical element right before the first element in the map container (which is considered its reverse end).
@@ -239,7 +239,7 @@ namespace ft
 			{
 				if (find(k) == end())
 					return 0;
-				_tree.root = _tree.deleteNode(ft::make_pair(k, mapped_type()));
+				_tree.root = _tree.deleteNode(_tree.root, ft::make_pair(k, mapped_type()));
 				_tree.dummy_past_end->left = _tree.maxValueNode(_tree.root); //update dummy past-the-end
 				return 1;
 			}
@@ -284,27 +284,27 @@ namespace ft
 			//Searches the container for an element with a key equivalent to k and returns an iterator to it if found, otherwise it returns an iterator to map::end.
 			iterator find (const key_type& k)
 			{
-				typename ft::TreeNode<value_type> * node_found = iterativeSearch(ft::make_pair(k, mapped_type()));
+				typename ft::TreeNode<value_type> * node_found = _tree.iterativeSearch(ft::make_pair(k, mapped_type()));
 				if (node_found == NULL)
-					return iterator(end(), _tree.dummy_past_end);
-				return iterator(*node_found);
+					return iterator(end());
+				return iterator(node_found, _tree.dummy_past_end);
 			}
 
 			//Searches the container for an element with a key equivalent to k and returns a const iterator to it if found, otherwise it returns a const iterator to map::end.
 			const_iterator find (const key_type& k) const
 			{
-				typename ft::TreeNode<value_type> * node_found = iterativeSearch(ft::make_pair<key_type, mapped_type>());
+				typename ft::TreeNode<value_type> * node_found = _tree.iterativeSearch(ft::make_pair(k, mapped_type()));
 				if (node_found == NULL)
-					return const_iterator(end(), _tree.dummy_past_end);
-				return const_iterator(*node_found);
+					return const_iterator(end());
+				return const_iterator(node_found, _tree.dummy_past_end);
 			}
 
 			//Searches the container for elements with a key equivalent to k and returns the number of matches.
 			//Because all elements in a map container are unique, the function can only return 1 (if the element is found) or zero (otherwise).
 			size_type count (const key_type& k) const
 			{
-				iterator it_found = find(k);
-				if (*it_found == end())
+				const_iterator it_found = find(k);
+				if (it_found == end())
 					return 0;
 				return 1;
 			}
@@ -389,7 +389,8 @@ namespace ft
 				return allocator_type(_alloc);
 			}
 		private:
-			AVLTree<value_type, value_compare> _tree; //UTILISER MEME ALLOCATOR QUE MAP ?!!!
+			typedef AVLTree<value_type, value_compare, allocator_type> tree_type;
+			tree_type _tree; //UTILISER MEME ALLOCATOR QUE MAP ?!!!
 			key_compare _comp;
 			allocator_type _alloc;
 
@@ -437,7 +438,7 @@ namespace ft
 	template<class Key, class T, class Compare, class Alloc>
 	bool operator>=(const map<Key, T, Compare, Alloc> & lhs, const map<Key, T, Compare, Alloc> & rhs)
 	{
-			return !(rhs < lhs);
+			return !(lhs < rhs);
 	}
 
 	//The contents of container x are exchanged with those of y.
