@@ -6,7 +6,7 @@
 /*   By: vfiszbin <vfiszbin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/11 09:49:47 by vfiszbin          #+#    #+#             */
-/*   Updated: 2023/01/14 19:58:03 by vfiszbin         ###   ########.fr       */
+/*   Updated: 2023/01/15 11:23:27 by vfiszbin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -545,13 +545,10 @@ namespace ft
 			///------------------///
 
 			//Default constructor
-			avl_tree_iterator() : _ptr(0) {}
-
-			//Constructor from pointer
-			avl_tree_iterator(node_pointer p) : _ptr(p) {}
+			avl_tree_iterator(node_pointer p = 0, node_pointer dummy_past_end = 0) : _ptr(p), _dummy_past_end(dummy_past_end) {}
 
 			//Copy constructor
-			avl_tree_iterator(const avl_tree_iterator& r) : _ptr(r._ptr) {}
+			avl_tree_iterator(const avl_tree_iterator& r) : _ptr(r._ptr), _dummy_past_end(r._dummy_past_end) {}
 			
 			//Assignment operator overload
 			avl_tree_iterator& operator=(const avl_tree_iterator& r)
@@ -560,6 +557,7 @@ namespace ft
 					return *this;
 
 				_ptr = r._ptr;
+				_dummy_past_end = r._dummy_past_end;
 				return *this;
             }
 			
@@ -579,12 +577,18 @@ namespace ft
 			}
 
 			//Prefix increment
+			//Find next in-order value in the tree
 			avl_tree_iterator& operator++()
             {
-                if (_ptr->right)
+				if (_ptr == _dummy_past_end->left)
+					_ptr = _dummy_past_end;
+                else if (_ptr->right)
 					_ptr = minValueNode(_ptr->right);
 				else
 				{
+					//Move up the tree until we reach a node whose parent's left child is not this node,
+					//which means that we reached a node that had all of its left descendants visited but
+					//none of its right descendants. It is therefore the in-order next node we were looking for.
 					node_pointer p = _ptr->parent;
 					while (p != NULL && _ptr == p->right)
 					{
@@ -607,6 +611,7 @@ namespace ft
 			}
 
 			//Prefix decrement
+			//Find previous in-order value in the tree
 			avl_tree_iterator& operator--()
             {
                 if (_ptr->left)
@@ -637,15 +642,16 @@ namespace ft
 			//Convert to constant iterator   UTILE ? !!!
 			template<bool B>
 			operator avl_tree_iterator<const T, B> () const
-                { return avl_tree_iterator<const T, B>(_ptr); }
+                { return avl_tree_iterator<const T, B>(_ptr, _dummy_past_end); }
 
 		private:
 			node_pointer _ptr;
+			node_pointer _dummy_past_end;
 
 			node_pointer minValueNode(node_pointer node) 
 			{
 				node_pointer current = node;
-				/* loop down to find the leftmost leaf */
+				//loop down to find the leftmost leaf
 				while (current->left != NULL) 
 				{
 					current = current->left;
@@ -656,7 +662,7 @@ namespace ft
 			node_pointer maxValueNode(node_pointer node) 
 			{
 				node_pointer current = node;
-				/* loop down to find the rightmost leaf */
+				//loop down to find the rightmost leaf
 				while (current->right != NULL) 
 				{
 					current = current->right;

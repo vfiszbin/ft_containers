@@ -6,15 +6,14 @@
 /*   By: vfiszbin <vfiszbin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/12 16:02:00 by vfiszbin          #+#    #+#             */
-/*   Updated: 2023/01/14 18:59:48 by vfiszbin         ###   ########.fr       */
+/*   Updated: 2023/01/15 13:02:54 by vfiszbin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef BINARY_SEARCH_TREE_HPP
 # define BINARY_SEARCH_TREE_HPP
 
-#include<iostream> //REMOVE !!!
-using namespace std; //REMOVE !!!
+#include <iostream> //REMOVE !!!
 #define SPACE 10 //REMOVE !!!
 # include "utils.hpp"
 # include <memory>
@@ -50,15 +49,22 @@ namespace ft
 			typedef std::size_t size_type;
 
 			node_type* root;
+			//a dummy node used when end() is called in map. Its left child is root so that the -- iterator operator can find the last node
+			node_type* dummy_past_end; 
 			
 			AVLTree(const allocator_type& alloc = allocator_type()) : _alloc(alloc)
 			{
 				root = NULL;
+				dummy_past_end = _alloc.allocate(1);
+				_alloc.construct(dummy_past_end, T());
+				dummy_past_end->left = root;
 			}
 
 			~AVLTree()
 			{
 				clear(root);
+				_alloc.destroy(dummy_past_end);
+				_alloc.deallocate(dummy_past_end, 1);
 			}
 
 			bool isTreeEmpty() const
@@ -147,7 +153,7 @@ namespace ft
 				node_type* new_node = _alloc.allocate(1);
 				_alloc.construct(new_node, value);
 				root = this->insert(root, new_node, inserted, inserted_or_found);
-
+				dummy_past_end->left = maxValueNode(root); //update dummy past-the-end
 				if (*inserted == false)
 				{
 					_alloc.destroy(new_node);
@@ -229,7 +235,7 @@ namespace ft
 			node_type * minValueNode(node_type * node) const
 			{
 				node_type * current = node;
-				/* loop down to find the leftmost leaf */
+				//loop down to find the leftmost leaf
 				while (current->left != NULL) 
 				{
 					current = current->left;
@@ -240,7 +246,7 @@ namespace ft
 			node_type * maxValueNode(node_type * node) const
 			{
 				node_type * current = node;
-				/* loop down to find the rightmost leaf */
+				//loop down to find the rightmost leaf
 				while (current->right != NULL) 
 				{
 					current = current->right;
@@ -297,8 +303,31 @@ namespace ft
 					{
 						//node with two children: find the inorder successor (smallest key in the right subtree) 
 						node_type * temp = minValueNode(r->right);
+						
 						//copy the inorder successor's content to the current node 
 						r->value = temp->value;
+
+						// node_type* new_r = _alloc.allocate(1);
+						// _alloc.construct(new_r, temp->value);
+						// new_r->parent = r->parent;
+						// new_r->left = r->left;
+						// new_r->right = r->right;
+						
+						// if (r->left)
+						// 	r->left->parent = new_r;
+						// if (r->right)
+						// 	r->right->parent = new_r;
+						// if (r->parent)
+						// {
+						// 	if (r->parent->left == r)
+						// 		r->parent->left = new_r;
+						// 	else
+						// 		r->parent->right = new_r;
+						// }
+						// _alloc.destroy(r);
+						// _alloc.deallocate(r, 1);
+						// r = new_r;
+
 						//delete the inorder successor 
 						r->right = deleteNode(r->right, temp->value);
 						if (r->right != NULL)
@@ -336,13 +365,13 @@ namespace ft
 				return;
 				space += SPACE; // Increase distance between levels   2
 				print2D(r -> right, space); // Process right child first 3 
-				cout << endl;
+				std::cout << std::endl;
 				for (int i = SPACE; i < space; i++) // 5 
-				cout << " "; // 5.1  
+				std::cout << " "; // 5.1  
 				if (r->parent)
-					cout << r -> value.first << "," << r->value.second << "," << r->parent->value.first <<"\n"; // 6 t 
+					std::cout << r -> value.first << "," << r->value.second << "," << r->parent->value.first <<"\n"; // 6 t 
 				else
-					cout << r -> value.first << "," << r->value.second << "," << "\n"; // 6
+					std::cout << r -> value.first << "," << r->value.second << "," << "\n"; // 6
 				print2D(r -> left, space); // Process left child  7
 			}
 			void printPreorder(node_type * r) //(current node, Left, Right) 
@@ -351,9 +380,9 @@ namespace ft
 				return;
 				/* first print data of node */
 				if (r->parent)
-					cout << r -> value.first << "," << r->value.second << "," << r->parent->value.first << " "; 
+					std::cout << r -> value.first << "," << r->value.second << "," << r->parent->value.first << " "; 
 				else
-					cout << r -> value.first << "," << r->value.second  << " ";
+					std::cout << r -> value.first << "," << r->value.second  << " ";
 				/* then recur on left sutree */
 				printPreorder(r -> left);
 				/* now recur on right subtree */
@@ -368,9 +397,9 @@ namespace ft
 				printInorder(r -> left);
 				/* then print the data of node */
 				if (r->parent)
-					cout << r -> value.first << "," << r->value.second << "," << r->parent->value.first << " "; 
+					std::cout << r -> value.first << "," << r->value.second << "," << r->parent->value.first << " "; 
 				else
-					cout << r -> value.first << "," << r->value.second  << " ";
+					std::cout << r -> value.first << "," << r->value.second  << " ";
 				/* now recur on right child */
 				printInorder(r -> right);
 			}
@@ -384,9 +413,9 @@ namespace ft
 				printPostorder(r -> right);
 				// now deal with the node 
 				if (r->parent)
-					cout << r -> value.first << "," << r->value.second << "," << r->parent->value.first << " ";
+					std::cout << r -> value.first << "," << r->value.second << "," << r->parent->value.first << " ";
 				else
-				cout << r -> value.first << "," << r->value.second  << " ";
+				std::cout << r -> value.first << "," << r->value.second  << " ";
 			}
 
 			/* Print nodes at a given level */
@@ -394,7 +423,7 @@ namespace ft
 				if (r == NULL)
 				return;
 				else if (level == 0)
-				cout << r -> value.first << "," << r->value.second  << " ";
+				std::cout << r -> value.first << "," << r->value.second  << " ";
 				else // level > 0  
 				{
 				printGivenLevel(r -> left, level - 1);

@@ -82,6 +82,7 @@ namespace ft
 			//The copy constructor creates a container that keeps and uses copies of x's allocator and comparison object.
 			map (const map& x) : _tree(), _comp(x._comp), _alloc(x._alloc)
 			{
+				const_iterator beg = x.begin();
 				insert(x.begin(), x.end()); //FAUT COPIE CHAQUE ELEM DE X !!!
 			}
 
@@ -106,25 +107,29 @@ namespace ft
 			//Returns an iterator referring to the first element in the map container.
 			iterator begin()
 			{
-				return iterator(_tree.minValueNode(_tree.root));
+				if (_tree.root == NULL)
+					return iterator(_tree.dummy_past_end);
+				return iterator(_tree.minValueNode(_tree.root), _tree.dummy_past_end);
 			}
 			
 			//Returns a const iterator referring to the first element in the map container.
 			const_iterator begin() const
 			{
-				return const_iterator(_tree.minValueNode(_tree.root));
+				if (_tree.root == NULL)
+					return const_iterator(_tree.dummy_past_end);
+				return const_iterator(_tree.minValueNode(_tree.root), _tree.dummy_past_end);
 			}
 
 			//Returns an iterator referring to the past-the-end element in the map container.
 			iterator end()
 			{
-				return iterator(NULL);
+				return iterator(_tree.dummy_past_end, _tree.dummy_past_end);
 			}
 
 			//Returns a const iterator referring to the past-the-end element in the map container.
 			const_iterator end() const
 			{
-				return const_iterator(NULL);
+				return const_iterator(_tree.dummy_past_end, _tree.dummy_past_end);
 			}
 
 			//Returns a reverse iterator pointing to the last element in the container (i.e., its reverse beginning).
@@ -203,7 +208,7 @@ namespace ft
 				typename ft::TreeNode<value_type> * inserted_or_found;
 
 				_tree.create_and_insert(val, &inserted, &inserted_or_found);
-				return ft::make_pair<iterator, bool>(iterator(inserted_or_found), inserted);
+				return ft::make_pair<iterator, bool>(iterator(inserted_or_found, _tree.dummy_past_end), inserted);
 			}
 
 			//Insert val using position as an hint about where to insert it. Position might not be used.
@@ -225,6 +230,7 @@ namespace ft
 			void erase (iterator position)
 			{
 				_tree.root = _tree.deleteNode(_tree.root, *position);
+				_tree.dummy_past_end->left = _tree.maxValueNode(_tree.root); //update dummy past-the-end
 			}
 
 			//Removes the element of key k from the map
@@ -234,6 +240,7 @@ namespace ft
 				if (find(k) == end())
 					return 0;
 				_tree.root = _tree.deleteNode(ft::make_pair(k, mapped_type()));
+				_tree.dummy_past_end->left = _tree.maxValueNode(_tree.root); //update dummy past-the-end
 				return 1;
 			}
 
@@ -278,7 +285,7 @@ namespace ft
 			{
 				typename ft::TreeNode<value_type> * node_found = iterativeSearch(ft::make_pair(k, mapped_type()));
 				if (node_found == NULL)
-					return iterator(end());
+					return iterator(end(), _tree.dummy_past_end);
 				return iterator(*node_found);
 			}
 
@@ -287,7 +294,7 @@ namespace ft
 			{
 				typename ft::TreeNode<value_type> * node_found = iterativeSearch(ft::make_pair<key_type, mapped_type>());
 				if (node_found == NULL)
-					return const_iterator(end());
+					return const_iterator(end(), _tree.dummy_past_end);
 				return const_iterator(*node_found);
 			}
 
