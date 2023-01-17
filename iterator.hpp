@@ -6,7 +6,7 @@
 /*   By: vfiszbin <vfiszbin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/11 09:49:47 by vfiszbin          #+#    #+#             */
-/*   Updated: 2023/01/16 15:18:03 by vfiszbin         ###   ########.fr       */
+/*   Updated: 2023/01/17 17:44:57 by vfiszbin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -581,7 +581,7 @@ namespace ft
 				if (_ptr == _dummy_past_end->left)
 					_ptr = _dummy_past_end;
                 else if (_ptr->right)
-					_ptr = minValueNode(_ptr->right);
+					_ptr = min_value_node(_ptr->right);
 				else
 				{
 					//Move up the tree until we reach a node whose parent's left child is not this node,
@@ -613,7 +613,7 @@ namespace ft
 			avl_tree_iterator& operator--()
             {
                 if (_ptr->left)
-					_ptr = maxValueNode(_ptr->left);
+					_ptr = max_value_node(_ptr->left);
 				else
 				{
 					node_pointer p = _ptr->parent;
@@ -646,7 +646,7 @@ namespace ft
 			node_pointer _ptr;
 			node_pointer _dummy_past_end;
 
-			node_pointer minValueNode(node_pointer node) 
+			node_pointer min_value_node(node_pointer node) 
 			{
 				node_pointer current = node;
 				//loop down to find the leftmost leaf
@@ -657,7 +657,7 @@ namespace ft
 				return current;
 			}
 
-			node_pointer maxValueNode(node_pointer node) 
+			node_pointer max_value_node(node_pointer node) 
 			{
 				node_pointer current = node;
 				//loop down to find the rightmost leaf

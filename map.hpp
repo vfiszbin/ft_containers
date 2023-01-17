@@ -109,7 +109,7 @@ namespace ft
 			{
 				if (_tree.root == NULL)
 					return iterator(_tree.dummy_past_end);
-				return iterator(_tree.minValueNode(_tree.root), _tree.dummy_past_end);
+				return iterator(_tree.min_value_node(_tree.root), _tree.dummy_past_end);
 			}
 			
 			//Returns a const iterator referring to the first element in the map container.
@@ -117,7 +117,7 @@ namespace ft
 			{
 				if (_tree.root == NULL)
 					return const_iterator(_tree.dummy_past_end);
-				return const_iterator(_tree.minValueNode(_tree.root), _tree.dummy_past_end);
+				return const_iterator(_tree.min_value_node(_tree.root), _tree.dummy_past_end);
 			}
 
 			//Returns an iterator referring to the past-the-end element in the map container.
@@ -159,7 +159,7 @@ namespace ft
 			//Returns whether the map container is empty (i.e. whether its size is 0).
 			bool empty() const
 			{
-				return _tree.isTreeEmpty();
+				return _tree.tree_is_empty();
 			}
 
 			size_type size() const
@@ -229,8 +229,8 @@ namespace ft
 			//Removes the element pointed to by position from the map
 			void erase (iterator position)
 			{
-				_tree.root = _tree.deleteNode(_tree.root, *position);
-				_tree.dummy_past_end->left = _tree.maxValueNode(_tree.root); //update dummy past-the-end
+				_tree.root = _tree.delete_node(_tree.root, *position);
+				_tree.dummy_past_end->left = _tree.max_value_node(_tree.root); //update dummy past-the-end
 			}
 
 			//Removes the element of key k from the map
@@ -239,8 +239,8 @@ namespace ft
 			{
 				if (find(k) == end())
 					return 0;
-				_tree.root = _tree.deleteNode(_tree.root, ft::make_pair(k, mapped_type()));
-				_tree.dummy_past_end->left = _tree.maxValueNode(_tree.root); //update dummy past-the-end
+				_tree.root = _tree.delete_node(_tree.root, ft::make_pair(k, mapped_type()));
+				_tree.dummy_past_end->left = _tree.max_value_node(_tree.root); //update dummy past-the-end
 				return 1;
 			}
 
@@ -283,7 +283,7 @@ namespace ft
 			//Searches the container for an element with a key equivalent to k and returns an iterator to it if found, otherwise it returns an iterator to map::end.
 			iterator find (const key_type& k)
 			{
-				typename ft::TreeNode<value_type> * node_found = _tree.iterativeSearch(ft::make_pair(k, mapped_type()));
+				typename ft::TreeNode<value_type> * node_found = _tree.iterative_search(ft::make_pair(k, mapped_type()));
 				if (node_found == NULL)
 					return iterator(end());
 				return iterator(node_found, _tree.dummy_past_end);
@@ -292,7 +292,7 @@ namespace ft
 			//Searches the container for an element with a key equivalent to k and returns a const iterator to it if found, otherwise it returns a const iterator to map::end.
 			const_iterator find (const key_type& k) const
 			{
-				typename ft::TreeNode<value_type> * node_found = _tree.iterativeSearch(ft::make_pair(k, mapped_type()));
+				typename ft::TreeNode<value_type> * node_found = _tree.iterative_search(ft::make_pair(k, mapped_type()));
 				if (node_found == NULL)
 					return const_iterator(end());
 				return const_iterator(node_found, _tree.dummy_past_end);

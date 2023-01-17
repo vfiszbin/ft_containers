@@ -6,7 +6,7 @@
 /*   By: vfiszbin <vfiszbin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/11 09:28:40 by vfiszbin          #+#    #+#             */
-/*   Updated: 2023/01/12 08:51:46 by vfiszbin         ###   ########.fr       */
+/*   Updated: 2023/01/17 15:40:53 by vfiszbin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,16 +30,16 @@ namespace ft
 			/// Member functions ///
 
 			//Constructor
-			explicit stack (const container_type& ctnr = container_type()) : _ctnr(ctnr) {}
+			explicit stack (const container_type& ctnr = container_type()) : c(ctnr) {}
 			//explicit keyword prevents implicit call to the constructor
 
 			//Copy constructor
-			stack(const stack& s): _ctnr(s._ctnr) {}
+			stack(const stack& s): c(s.c) {}
 
 			//Assignment operator
 			stack& operator=(const stack & s)
 			{
-				_ctnr = s._ctnr;
+				c = s.c;
 				return (*this);
 			}
 
@@ -49,41 +49,41 @@ namespace ft
 			//Test whether container is empty
 			bool empty() const
 			{
-				return _ctnr.empty();
+				return c.empty();
 			}
 
 			//Return size
 			size_type size() const
 			{
-				return _ctnr.size();
+				return c.size();
 			}
 
 			//Access next element
 			value_type& top()
 			{
-				return (_ctnr.back());
+				return (c.back());
 			}
 
 			//Access next element
 			const value_type& top() const
 			{
-				return (_ctnr.back());
+				return (c.back());
 			}
 
 			//Insert element
 			void push (const value_type& val)
 			{
-				_ctnr.push_back(val);
+				c.push_back(val);
 			}
 
 			//Remove top element
 			void pop()
 			{
-				_ctnr.pop_back();
+				c.pop_back();
 			}
 
 			//Declare relational operators functions as friends of the stack class
-			//It is necessary because these functions must access the private member _ctnr
+			//It is necessary because these functions must access the protected member c
 			template < class T_rops, class Container_rops >
 			friend bool operator== (const ft::stack<T_rops, Container_rops>& lhs, const ft::stack<T_rops, Container_rops>& rhs);
 
@@ -102,8 +102,8 @@ namespace ft
 			template < class T_rops, class Container_rops >
 			friend bool operator>= (const ft::stack<T_rops, Container_rops>& lhs, const ft::stack<T_rops, Container_rops>& rhs);
 
-		private:
-			container_type _ctnr;
+		protected:
+			container_type c;
 
 	};
 
@@ -112,37 +112,37 @@ namespace ft
 	template < class T, class Container >
 	bool operator== (const ft::stack<T, Container>& lhs, const ft::stack<T, Container>& rhs)
 	{
-		return lhs._ctnr == rhs._ctnr;
+		return lhs.c == rhs.c;
 	}
 
 	template < class T, class Container >
 	bool operator!= (const ft::stack<T, Container>& lhs, const ft::stack<T, Container>& rhs)
 	{
-		return lhs._ctnr != rhs._ctnr;
+		return lhs.c != rhs.c;
 	}
 
 	template < class T, class Container >
 	bool operator< (const ft::stack<T, Container>& lhs, const ft::stack<T, Container>& rhs)
 	{
-		return lhs._ctnr < rhs._ctnr;
+		return lhs.c < rhs.c;
 	}
 
 	template < class T, class Container >
 	bool operator<= (const ft::stack<T, Container>& lhs, const ft::stack<T, Container>& rhs)
 	{
-		return lhs._ctnr <= rhs._ctnr;
+		return lhs.c <= rhs.c;
 	}
 
 	template < class T, class Container >
 	bool operator> (const ft::stack<T, Container>& lhs, const ft::stack<T, Container>& rhs)
 	{
-		return lhs._ctnr > rhs._ctnr;
+		return lhs.c > rhs.c;
 	}
 
 	template < class T, class Container >
 	bool operator>= (const ft::stack<T, Container>& lhs, const ft::stack<T, Container>& rhs)
 	{
-		return lhs._ctnr >= rhs._ctnr;
+		return lhs.c >= rhs.c;
 	}
 
 }

@@ -6,7 +6,7 @@
 /*   By: vfiszbin <vfiszbin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/12 16:02:00 by vfiszbin          #+#    #+#             */
-/*   Updated: 2023/01/16 16:43:44 by vfiszbin         ###   ########.fr       */
+/*   Updated: 2023/01/17 18:25:46 by vfiszbin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,13 +28,14 @@ namespace ft
 			typedef T value_type;
 			
 			T value;
+			int height;
 			TreeNode * left;
 			TreeNode * right;
 			TreeNode * parent;
 
-			TreeNode() : value(), left(NULL), right(NULL), parent(NULL) {}
+			TreeNode() : value(), height(0), left(NULL), right(NULL), parent(NULL)  {}
 
-			TreeNode(T v) : value(v), left(NULL), right(NULL), parent(NULL) {}
+			TreeNode(T v) : value(v), height(0), left(NULL), right(NULL), parent(NULL) {}
 	};
 
 	//AVL Tree is a balanced binary search tree. 
@@ -77,7 +78,7 @@ namespace ft
 				_alloc.deallocate(dummy_past_end, 1);
 			}
 
-			bool isTreeEmpty() const
+			bool tree_is_empty() const
 			{
 				if (root == NULL) 
 					return true;
@@ -85,35 +86,61 @@ namespace ft
 					return false;
 			}
 			
-			// Get Height  
+			// // Get Height  !!!
+			// int height(node_type * r) const
+			// {
+			// 	if (r == NULL)
+			// 		return -1; //base height is -1 for NULL nodes
+					
+			// 	else 
+			// 	{
+			// 		//recursively compute height in each subtree
+			// 		int lheight = height(r->left);
+			// 		int rheight = height(r->right);
+
+			// 		//use the biggest height, +1 to account for current node
+			// 		if (lheight > rheight)
+			// 			return (lheight + 1);
+			// 		else 
+			// 			return (rheight + 1);
+			// 	}
+			// }
+
+			//return height for node r
 			int height(node_type * r) const
 			{
 				if (r == NULL)
 					return -1; //base height is -1 for NULL nodes
-					
-				else 
-				{
-					//recursively compute height in each subtree
-					int lheight = height(r->left);
-					int rheight = height(r->right);
+				return r->height;
+			}
+							
+			//update height for node r
+			void update_height(node_type * r)
+			{
+				int lheight = height(r->left);
+				int rheight = height(r->right);
+				r->height = std::max(lheight, rheight) + 1;
+			}
 
-					//use the biggest height, +1 to account for current node
-					if (lheight > rheight)
-						return (lheight + 1);
-					else 
-						return (rheight + 1);
+			//update the height of all the direct predecessors of r
+			void update_predecessors_height(node_type * r)
+			{
+				while (r->parent)
+				{
+					update_height(r->parent->height);
+					r = r->parent;
 				}
 			}
 
 			// Get Balance factor of node N  
-			int getBalanceFactor(node_type * n) const
+			int get_balance_factor(node_type * n) const
 			{
 				if (n == NULL)
 					return -1; //base height is -1 for NULL nodes
 				return height(n->left) - height(n->right);
 			}
 
-			node_type * rightRotate(node_type * y) 
+			node_type * right_rotate(node_type * y) 
 			{
 				node_type * x = y->left;
 				node_type * T2 = x->right;
@@ -130,10 +157,12 @@ namespace ft
 				if (T2 != NULL)
 					T2->parent = y;
 
+				update_height(y);
+				update_height(x);
 				return x;
 			}
 
-			node_type * leftRotate(node_type * x) 
+			node_type * left_rotate(node_type * x) 
 			{
 				node_type * y = x->right;
 				node_type * T2 = y->left;
@@ -150,6 +179,8 @@ namespace ft
 				if (T2 != NULL)
 					T2->parent = x;
 
+				update_height(x);
+				update_height(y);
 				return y;
 			}
 
@@ -159,7 +190,8 @@ namespace ft
 				node_type* new_node = _alloc.allocate(1);
 				_alloc.construct(new_node, value);
 				root = this->insert(root, new_node, inserted, inserted_or_found);
-				dummy_past_end->left = maxValueNode(root); //update dummy past-the-end
+				if (dummy_past_end->left == NULL || _comp(dummy_past_end->left->value, value))
+					dummy_past_end->left = max_value_node(root); //update dummy past-the-end
 				if (*inserted == false)
 				{
 					_alloc.destroy(new_node);
@@ -187,6 +219,7 @@ namespace ft
 					r->left = insert(r->left, new_node, inserted, inserted_or_found);
 					if (r->left != NULL)
 						r->left->parent = r;
+					update_height(r);
 				}
 				//If key to insert is superior to current node key, go right
 				else if (_comp(r->value, new_node->value)) 
@@ -194,6 +227,7 @@ namespace ft
 					r->right = insert(r->right, new_node, inserted, inserted_or_found);
 					if (r->right != NULL)
 						r->right->parent = r;
+					update_height(r);
 				} 
 				//If the key already exists, do nothing
 				else 
@@ -210,27 +244,27 @@ namespace ft
 				//so we are assured to be as far in the tree as possible (right above the insertion spot).
 				//We will then gradually climb the tree towards the root.
 				
-				int bf = getBalanceFactor(r);
+				int bf = get_balance_factor(r);
 				//Left Left Case  
 				if (bf > 1 && _comp(new_node->value, r->left->value))
-					return rightRotate(r);
+					return right_rotate(r);
 
 				//Right Right Case  
 				if (bf < -1 && _comp(r->right->value, new_node->value))
-					return leftRotate(r);
+					return left_rotate(r);
 
 				//Left Right Case  
 				if (bf > 1 && _comp(r->left->value, new_node->value)) 
 				{
-					r->left = leftRotate(r->left);
-					return rightRotate(r);
+					r->left = left_rotate(r->left);
+					return right_rotate(r);
 				}
 
 				//Right Left Case  
 				if (bf < -1 && _comp(new_node->value, r->right->value)) 
 				{
-					r->right = rightRotate(r->right);
-					return leftRotate(r);
+					r->right = right_rotate(r->right);
+					return left_rotate(r);
 				}
 
 				/* return the (unchanged) node pointer */
@@ -238,7 +272,7 @@ namespace ft
 
 			}
 
-			node_type * minValueNode(node_type * node) const
+			node_type * min_value_node(node_type * node) const
 			{
 				node_type * current = node;
 				//loop down to find the leftmost leaf
@@ -249,7 +283,7 @@ namespace ft
 				return current;
 			}
 
-			node_type * maxValueNode(node_type * node) const
+			node_type * max_value_node(node_type * node) const
 			{
 				node_type * current = node;
 				//loop down to find the rightmost leaf
@@ -262,7 +296,7 @@ namespace ft
 
 			//Delete the node of key k from the tree starting at root r.
 			//Return the new root
-			node_type * deleteNode(node_type * r, T k) 
+			node_type * delete_node(node_type * r, T k) 
 			{
 				/// Usual binary search tree deletion steps ///
 				
@@ -275,17 +309,19 @@ namespace ft
 				//then it must be in the left subtree 
 				else if (_comp(k, r->value)) 
 				{
-					r->left = deleteNode(r->left, k);
+					r->left = delete_node(r->left, k);
 					if (r->left != NULL)
 						r->left->parent = r;
+					update_height(r);
 				}
 				//If the key to be deleted is greater than the current node's key, 
 				//then it must be in the right subtree 
 				else if (_comp(r->value, k)) 
 				{
-					r->right = deleteNode(r->right, k);
+					r->right = delete_node(r->right, k);
 					if (r->right != NULL)
 						r->right->parent = r;
+					update_height(r);
 				}
 				//If the key is same as current node's key, then the current node is the one to delete
 				else 
@@ -297,7 +333,7 @@ namespace ft
 						_alloc.destroy(r);
 						_alloc.deallocate(r, 1);
 						return temp; //return the child to link it with the deleted node's parent
-					} 
+					}
 					else if (r->right == NULL) 
 					{
 						node_type * temp = r->left;
@@ -308,10 +344,10 @@ namespace ft
 					else 
 					{
 						//node with two children: find the inorder successor (smallest key in the right subtree) 
-						node_type * temp = minValueNode(r->right);
+						node_type * temp = min_value_node(r->right);
 
 						//unlink the inorder successor from the tree so that it can replace the deleted node
-						r->right = replaceNode(r->right, temp->value);
+						r->right = replace_node(r->right, temp->value);
 						
 						//Replace the deleted node by the inorder successor
 						temp->parent = r->parent;
@@ -332,59 +368,62 @@ namespace ft
 						_alloc.destroy(r);
 						_alloc.deallocate(r, 1);
 						r = temp;
+						update_height(r);
 					}
 				}
 
 				/// The following steps are specific to AVL trees, we must rebalance if necessary ///
 
-				int bf = getBalanceFactor(r);
+				int bf = get_balance_factor(r);
 				//Left Left Imbalance/Case or Right rotation 
-				if (bf == 2 && getBalanceFactor(r->left) >= 0)
-					return rightRotate(r);
+				if (bf == 2 && get_balance_factor(r->left) >= 0)
+					return right_rotate(r);
 				//Left Right Imbalance/Case or LR rotation 
-				else if (bf == 2 && getBalanceFactor(r->left) == -1) 
+				else if (bf == 2 && get_balance_factor(r->left) == -1) 
 				{
-					r->left = leftRotate(r->left);
-					return rightRotate(r);
+					r->left = left_rotate(r->left);
+					return right_rotate(r);
 				}
 				//Right Right Imbalance/Case or Left rotation	
-				else if (bf == -2 && getBalanceFactor(r->right) <= -0)
-					return leftRotate(r);
+				else if (bf == -2 && get_balance_factor(r->right) <= -0)
+					return left_rotate(r);
 				//Right Left Imbalance/Case or RL rotation 
-				else if (bf == -2 && getBalanceFactor(r->right) == 1) 
+				else if (bf == -2 && get_balance_factor(r->right) == 1) 
 				{
-					r->right = rightRotate(r->right);
-					return leftRotate(r);
+					r->right = right_rotate(r->right);
+					return left_rotate(r);
 				}
 
 				return r;
 			}
 			
-			//Sames as deleteNode, except the node with value k is not destroyed but simply unlinked from the rest of the tree
-			node_type * replaceNode(node_type * r, T k)
+			//Sames as delete_node, except the node with value k is not destroyed but simply unlinked from the rest of the tree
+			node_type * replace_node(node_type * r, T k)
 			{
 				//Base case : no node with key k was found
 				if (r == NULL) 
 				{
 					return NULL;
 				}
-				//If the key to be replace is smaller than the current node's key, 
+				//If the key to be replaced is smaller than the current node's key, 
 				//then it must be in the left subtree 
 				else if (_comp(k, r->value)) 
 				{
-					r->left = replaceNode(r->left, k);
+					r->left = replace_node(r->left, k);
 					if (r->left != NULL)
 						r->left->parent = r;
+					update_height(r);
 				}
-				//If the key to be replace is greater than the current node's key, 
+				//If the key to be replaced is greater than the current node's key, 
 				//then it must be in the right subtree 
 				else if (_comp(r->value, k)) 
 				{
-					r->right = replaceNode(r->right, k);
+					r->right = replace_node(r->right, k);
 					if (r->right != NULL)
 						r->right->parent = r;
+					update_height(r);
 				}
-				//If the key is same as current node's key, then the current node is the one to delete
+				//If the key is same as current node's key, then the current node is the one to replace
 				else 
 				{
 					//node with only one child or no child 
@@ -397,29 +436,29 @@ namespace ft
 					{
 						node_type * temp = r->left;
 						return temp; //return the child to link it with the replaced node's parent
-					} 
+					}
 				}
 
 				/// The following steps are specific to AVL trees, we must rebalance if necessary ///
 
-				int bf = getBalanceFactor(r);
+				int bf = get_balance_factor(r);
 				//Left Left Imbalance/Case or Right rotation 
-				if (bf == 2 && getBalanceFactor(r->left) >= 0)
-					return rightRotate(r);
+				if (bf == 2 && get_balance_factor(r->left) >= 0)
+					return right_rotate(r);
 				//Left Right Imbalance/Case or LR rotation 
-				else if (bf == 2 && getBalanceFactor(r->left) == -1) 
+				else if (bf == 2 && get_balance_factor(r->left) == -1) 
 				{
-					r->left = leftRotate(r->left);
-					return rightRotate(r);
+					r->left = left_rotate(r->left);
+					return right_rotate(r);
 				}
 				//Right Right Imbalance/Case or Left rotation	
-				else if (bf == -2 && getBalanceFactor(r->right) <= -0)
-					return leftRotate(r);
+				else if (bf == -2 && get_balance_factor(r->right) <= -0)
+					return left_rotate(r);
 				//Right Left Imbalance/Case or RL rotation 
-				else if (bf == -2 && getBalanceFactor(r->right) == 1) 
+				else if (bf == -2 && get_balance_factor(r->right) == 1) 
 				{
-					r->right = rightRotate(r->right);
-					return leftRotate(r);
+					r->right = right_rotate(r->right);
+					return left_rotate(r);
 				}
 				
 				return r;
@@ -503,7 +542,7 @@ namespace ft
 				printGivenLevel(r, i);
 			}
 
-			node_type * iterativeSearch(T v) const
+			node_type * iterative_search(T v) const
 			{
 				if (root == NULL) 
 				{
@@ -523,18 +562,6 @@ namespace ft
 					}
 				return NULL;
 				}
-			}
-
-			node_type * recursiveSearch(node_type * r, int val) const//CHANGER OU SUPPR !!!
-			{
-				if (r == NULL || r -> value == val)
-					return r;
-
-				else if (val < r -> value)
-					return recursiveSearch(r -> left, val);
-
-				else
-					return recursiveSearch(r -> right, val);
 			}
 
 			//Destroy and deallocate the entire tree starting from root r
