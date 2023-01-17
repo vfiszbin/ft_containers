@@ -6,7 +6,7 @@
 /*   By: vfiszbin <vfiszbin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/12 16:02:00 by vfiszbin          #+#    #+#             */
-/*   Updated: 2023/01/15 19:45:53 by vfiszbin         ###   ########.fr       */
+/*   Updated: 2023/01/16 16:43:44 by vfiszbin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,7 +41,7 @@ namespace ft
 	//For each node, the height difference between left and right subtrees (balance factor) cannot be more than one
 	//It ensures that lookup, insertion, and deletion all take O(log n)
 	//T : type of the value contained by each node (ex: the type pair)
-	template <class T, class Compare = std::less<T>, class Alloc = std::allocator<TreeNode<T>> >
+	template <class T, class Compare = std::less<T>, class Alloc = std::allocator<TreeNode<T> > >
 	class AVLTree 
 	{
 		public:
@@ -80,13 +80,9 @@ namespace ft
 			bool isTreeEmpty() const
 			{
 				if (root == NULL) 
-				{
 					return true;
-				} 
 				else 
-				{
 					return false;
-				}
 			}
 			
 			// Get Height  
@@ -313,14 +309,11 @@ namespace ft
 					{
 						//node with two children: find the inorder successor (smallest key in the right subtree) 
 						node_type * temp = minValueNode(r->right);
-						
-						//copy the inorder successor's content to the current node 
-						// r->value = temp->value;
 
-						//delete the inorder successor 
-						// r->right = deleteNode(r->right, temp->value);
+						//unlink the inorder successor from the tree so that it can replace the deleted node
 						r->right = replaceNode(r->right, temp->value);
 						
+						//Replace the deleted node by the inorder successor
 						temp->parent = r->parent;
 						temp->left = r->left;
 						temp->right = r->right;
@@ -335,8 +328,7 @@ namespace ft
 							else
 								r->parent->right = temp;
 						}
-						// if (r == root)
-						// 	root = temp;
+						//Delete the node to be deleted
 						_alloc.destroy(r);
 						_alloc.deallocate(r, 1);
 						r = temp;
@@ -368,7 +360,7 @@ namespace ft
 				return r;
 			}
 			
-
+			//Sames as deleteNode, except the node with value k is not destroyed but simply unlinked from the rest of the tree
 			node_type * replaceNode(node_type * r, T k)
 			{
 				//Base case : no node with key k was found
@@ -376,7 +368,7 @@ namespace ft
 				{
 					return NULL;
 				}
-				//If the key to be deleted is smaller than the current node's key, 
+				//If the key to be replace is smaller than the current node's key, 
 				//then it must be in the left subtree 
 				else if (_comp(k, r->value)) 
 				{
@@ -384,7 +376,7 @@ namespace ft
 					if (r->left != NULL)
 						r->left->parent = r;
 				}
-				//If the key to be deleted is greater than the current node's key, 
+				//If the key to be replace is greater than the current node's key, 
 				//then it must be in the right subtree 
 				else if (_comp(r->value, k)) 
 				{
@@ -399,23 +391,42 @@ namespace ft
 					if (r->left == NULL) 
 					{
 						node_type * temp = r->right;
-						// _alloc.destroy(r);
-						// _alloc.deallocate(r, 1);
-						return temp; //return the child to link it with the deleted node's parent
+						return temp; //return the child to link it with the replaced node's parent
 					} 
 					else if (r->right == NULL) 
 					{
 						node_type * temp = r->left;
-						// _alloc.destroy(r);
-						// _alloc.deallocate(r, 1);
-						return temp; //return the child to link it with the deleted node's parent
+						return temp; //return the child to link it with the replaced node's parent
 					} 
 				}
+
+				/// The following steps are specific to AVL trees, we must rebalance if necessary ///
+
+				int bf = getBalanceFactor(r);
+				//Left Left Imbalance/Case or Right rotation 
+				if (bf == 2 && getBalanceFactor(r->left) >= 0)
+					return rightRotate(r);
+				//Left Right Imbalance/Case or LR rotation 
+				else if (bf == 2 && getBalanceFactor(r->left) == -1) 
+				{
+					r->left = leftRotate(r->left);
+					return rightRotate(r);
+				}
+				//Right Right Imbalance/Case or Left rotation	
+				else if (bf == -2 && getBalanceFactor(r->right) <= -0)
+					return leftRotate(r);
+				//Right Left Imbalance/Case or RL rotation 
+				else if (bf == -2 && getBalanceFactor(r->right) == 1) 
+				{
+					r->right = rightRotate(r->right);
+					return leftRotate(r);
+				}
+				
 				return r;
 			}
 
 
-
+			//ENELVER TOUS CES PRINT !!!
 			void print2D(node_type * r, int space) {
 				if (r == NULL) // Base case  1
 				return;
@@ -550,6 +561,15 @@ namespace ft
 			size_type max_size() const
 			{
 				return _alloc.max_size();
+			}
+
+			//Swap the content of two AVL trees
+			void swap(AVLTree &t)
+			{
+				std::swap(root, t.root);
+				std::swap(dummy_past_end, t.dummy_past_end);
+				std::swap(_alloc, t._alloc);
+				std::swap(_comp, t._comp);
 			}
 
 		private:

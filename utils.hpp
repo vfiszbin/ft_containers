@@ -6,7 +6,7 @@
 /*   By: vfiszbin <vfiszbin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/12 09:18:25 by vfiszbin          #+#    #+#             */
-/*   Updated: 2023/01/15 18:09:06 by vfiszbin         ###   ########.fr       */
+/*   Updated: 2023/01/16 19:24:28 by vfiszbin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,12 +44,6 @@ namespace ft
 
 	template <>
 	struct is_integral<char> : public ft::integral_constant<bool, true> {};
-
-	template <>
-	struct is_integral<char16_t> : public ft::integral_constant<bool, true> {};
-	
-	template <>
-	struct is_integral<char32_t> : public ft::integral_constant<bool, true> {};
 
 	template <>
 	struct is_integral<wchar_t>	: public ft::integral_constant<bool, true> {};
@@ -162,7 +156,6 @@ namespace ft
 	{
 		// MEMBER TYPES 
 
-		// typedef typename std::remove_const<T1>::type first_type; //OK DE FAIRE CA ? !!!
 		typedef T1 first_type;
 		typedef T2 second_type;
 

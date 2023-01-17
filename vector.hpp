@@ -6,7 +6,7 @@
 /*   By: vfiszbin <vfiszbin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/11 09:28:35 by vfiszbin          #+#    #+#             */
-/*   Updated: 2023/01/14 16:07:14 by vfiszbin         ###   ########.fr       */
+/*   Updated: 2023/01/16 18:36:10 by vfiszbin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,6 @@
 # include "iterator.hpp"
 # include "utils.hpp"
 
-
 namespace ft
 {
 	template < class T, class Alloc = std::allocator<T> >
@@ -28,7 +27,7 @@ namespace ft
 			///---------------///
 			/// MEMBER TYPES ///
 			///---------------///
-			typedef T::value_type value_type;
+			typedef T value_type;
 			typedef Alloc allocator_type;
 			typedef typename allocator_type::reference reference;
 			typedef typename allocator_type::const_reference const_reference;
@@ -218,7 +217,7 @@ namespace ft
 				{
 					//If n is also greater than the current container capacity, an automatic reallocation of the allocated storage space takes place.
 					if (n > _capacity)
-						reserve(n); //ALLOUER PLUS ?
+						reserve(n); //ALLOUER PLUS ? !!!
 
 					for (size_type i = _size; i < n; i++)
 						_alloc.construct(_start + i, val); //constructs (by calling the constructor of value_type with argument val) an element object on the location pointed by _start + i

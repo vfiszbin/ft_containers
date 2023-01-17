@@ -6,7 +6,7 @@
 /*   By: vfiszbin <vfiszbin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/11 09:49:47 by vfiszbin          #+#    #+#             */
-/*   Updated: 2023/01/15 18:22:08 by vfiszbin         ###   ########.fr       */
+/*   Updated: 2023/01/16 15:18:03 by vfiszbin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -535,8 +535,6 @@ namespace ft
 			typedef typename ft::iterator<ft::bidirectional_iterator_tag, value_type>::iterator_category iterator_category;
 			
 			//Choose template mechanism to choose between const and non-const version of a typedef
-			// typedef typename ft::iterator<ft::bidirectional_iterator_tag, value_type>::pointer pointer; //CHANGER ? !!!
-			// typedef typename ft::iterator<ft::bidirectional_iterator_tag, value_type>::reference reference;
 			typedef typename choose<is_const, const value_type &, value_type &>::type reference;
 			typedef typename choose<is_const, const value_type *, value_type *>::type pointer;
 
@@ -639,7 +637,7 @@ namespace ft
 				return cpy;
 			}
 
-			//Convert to constant iterator   UTILE ? !!!
+			//Convert to constant iterator
 			template<bool B>
 			operator avl_tree_iterator<const T, B> () const
                 { return avl_tree_iterator<const T, B>(_ptr, _dummy_past_end); }

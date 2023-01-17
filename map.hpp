@@ -10,7 +10,7 @@
 
 namespace ft
 {
-	template < class Key, class T, class Compare = std::less<Key>, class Alloc = std::allocator<ft::TreeNode<pair<const Key,T>> > >
+	template < class Key, class T, class Compare = std::less<Key>, class Alloc = std::allocator<ft::TreeNode<pair<const Key,T> > > >
 	class map
 	{	
 		public:
@@ -254,8 +254,7 @@ namespace ft
 			//Exchanges the content of the container by the content of x, which is another map of the same type
 			void swap (map& x)
 			{
-				//EST CE QUE CA MARCHE ? !!!
-				std::swap(_tree, x._tree);
+				_tree.swap(x._tree);
 				std::swap(_alloc, x._alloc);
 				std::swap(_comp, x._comp);
 			}
