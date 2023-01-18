@@ -85,7 +85,7 @@ namespace ft
 				clear();
 			}
 
-			//Assginment operator overload
+			//Assignment operator overload
 			//Copies all the elements from x into the container, changing its size accordingly.
 			//The container preserves its current allocator, which is used to allocate additional storage if needed.
 			map& operator= (const map& x)
@@ -257,6 +257,7 @@ namespace ft
 			{
 				_tree.clear(_tree.root);
 				_tree.root = NULL;
+				_tree.dummy_past_end->left = NULL;
 			}
 
 			//Returns a copy of the comparison object used by the container to compare keys.
