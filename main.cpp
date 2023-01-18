@@ -251,6 +251,231 @@ void vector_tests()
 	v2 = NS::vector<int>(arr, arr+3);
 	assert(v1 <= v2);
 	assert(v1 >= v2);
+}
+
+void map_tests()
+{
+	//empty constructor
+	NS::map<int, int> m;
+	assert(m.empty());
+
+	//constructor with comparison operator
+	NS::map<int, int, std::greater<int> >m2;
+	m2[1] = 2;
+	m2[2] = 1;
+	assert(m2.begin()->first == 2);
+
+	//copy constructor
+	NS::map<int, int> m3;
+	m3[1] = 2;
+	m3[2] = 1;
+	NS::map<int, int> m4(m3);
+	assert(m4.size() == 2);
+
+	//range constructor
+	NS::pair<int, int> arr[] = {NS::make_pair(1,2), NS::make_pair(2,3), NS::make_pair(3,4)};
+	NS::map<int, int> m5(arr, arr + 3);
+	assert(m5.size() == 3);
+	assert(m5[2] == 3);
+
+	//assignment operator
+	NS::map<int, int> m6;
+	m6[1] = 2;
+	m6[2] = 1;
+	NS::map<int, int> m7;
+	m7 = m6;
+	assert(m7.size() == m6.size());
+	assert(m7[2] == m6[2]);
+
+	NS::map<int, int> m8;
+	m8[3] = 4;
+	m8[4] = 3;
+	m8 = m6;
+	assert(m8.size() == m6.size());
+	assert(m8[2] == m6[2]);
+
+	m6 = m6;
+	assert(m6.size() == 2);
+	assert(m6[2] == m6[2]);
+
+	//begin
+	m[1] = 2;
+	m[2] = 1;
+	NS::map<int, int>::iterator it = m.begin();
+	assert(it->first == 1);
+	assert((++it)->first == 2);
+
+	//end
+	it = m.end();
+	it--;
+	assert(it->first == 2);
+
+	//rbegin
+	NS::map<int, int>::reverse_iterator rit = m.rbegin();
+	assert(rit->first == 2);
+
+	//rend
+	rit = m.rend();
+	rit--;
+	assert(rit->first == 1);
+
+	//at
+	assert(m.at(1) == 2);
+	m.at(1) = 3;
+	assert(m.at(1) == 3);
+
+	//insert
+	m.insert(NS::make_pair(3, 4));
+	assert(m.at(3) == 4);
+
+	it = m.find(1);
+	m.insert(it, NS::make_pair(4, 5));
+	assert(m.at(4) == 5);
+
+	m.clear();
+	m.insert(arr, arr + 2);
+	assert(m.size() == 2);
+
+	//erase
+	m.clear();
+	m[1] = 2;
+	m[2] = 1;
+	m.erase(1);
+	try {
+		m.at(1);
+		assert(false);
+	} catch(const std::out_of_range& e) {
+		assert(e.what() == std::string("map::at"));
+	}
+
+	it = m.find(2);
+	m.erase(it);
+	try {
+		m.at(2);
+		assert(false);
+	} catch(const std::out_of_range& e) {
+		assert(e.what() == std::string("map::at"));
+	}
+
+	m.clear();
+	m[1] = 2;
+	m[2] = 1;
+	m[3] = 4;
+	m[4] = 3;
+	m[5] = 6;
+	NS::map<int, int>::iterator it1 = m.find(2);
+	NS::map<int, int>::iterator it2 = m.find(4);
+	m.erase(it1, it2);
+	assert(m.size() == 3);
+
+	//swap
+	NS::map<int, int> m1;
+	m1[1] = 2;
+	m1[2] = 1;
+	m.clear();
+	m[3] = 4;
+	m[4] = 3;
+	m1.swap(m);
+	assert(m1.size() == 2);
+	assert(m[1] == 2);
+	assert(m[2] == 1);
+	assert(m1[3] == 4);
+	assert(m1[4] == 3);
+
+	m.clear();
+	m[1] = 2;
+	m[2] = 1;
+	m1.clear();
+	m.swap(m1);
+	assert(m.empty());
+
+	//clear
+	m[1] = 2;
+	m[2] = 1;
+	m.clear();
+	assert(m.empty());
+
+	//key_comp
+	NS::map<int, int>::key_compare comp = m.key_comp();
+	assert(comp(1, 2) == true);
+
+	NS::map<std::string, int> m_s;
+	NS::map<std::string, int>::key_compare comp2 = m_s.key_comp();
+	assert(comp2("a", "b") == true);
+
+	//value_comp
+	NS::map<int, int>::value_compare comp3 = m.value_comp();
+	assert(comp3(NS::make_pair(1,2), NS::make_pair(2,1)) == true);
+
+	NS::map<std::string, int>::value_compare comp4 = m_s.value_comp();
+	assert(comp4(NS::make_pair("a", 2), NS::make_pair("b", 1)) == true);
+
+	//find
+	m.clear();
+	m[1] = 2;
+	m[2] = 1;
+	it = m.find(1);
+	assert(it->first == 1);
+	assert(it->second == 2);
+
+	it = m.find(3);
+	assert(it == m.end());
+
+	//count	
+	assert(m.count(1) == 1);
+	assert(m.count(3) == 0);
+
+	//lower_bound
+	m[1] = 2;
+	m[2] = 1;
+	m[3] = 4;
+	it = m.lower_bound(2);
+	assert(it->first == 2);
+
+	it = m.lower_bound(4);
+	assert(it == m.end());
+
+	//upper_bound
+	it = m.upper_bound(2);
+	assert(it->first == 3);
+
+	it = m.upper_bound(4);
+	assert(it == m.end());
+
+	//equal_range
+	m[1] = 2;
+	m[2] = 1;
+	m[3] = 4;
+	m[4] = 3;
+	m[5] = 6;
+	NS::pair<NS::map<int, int>::iterator, NS::map<int, int>::iterator> range = m.equal_range(2);
+	NS::map<int, int>::iterator lower = range.first;
+	NS::map<int, int>::iterator upper = range.second;
+	assert(lower->first == 2);
+	assert(upper->first == 3);
+
+	//relational operators
+	m.clear();
+	m[1] = 2;
+	m[2] = 1;
+	m1.clear();
+	m1[3] = 4;
+	m1[4] = 3;
+	assert(m < m1);
+
+	assert(m1 > m);
+
+	assert(m <= m1);
+
+	assert(m1 >= m);
+
+	assert(m != m1);
+
+	m1.clear();
+	m1[1] = 2;
+	m1[2] = 1;
+
+	assert(m == m1);
 
 }
 
@@ -258,5 +483,6 @@ int main()
 {
 	stack_tests();
 	vector_tests();
-	return (0);
+	map_tests();
+	return 0;
 }
