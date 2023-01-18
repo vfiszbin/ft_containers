@@ -6,13 +6,13 @@
 #    By: vfiszbin <vfiszbin@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/01/16 15:33:50 by vfiszbin          #+#    #+#              #
-#    Updated: 2023/01/18 09:22:43 by vfiszbin         ###   ########.fr        #
+#    Updated: 2023/01/18 10:23:12 by vfiszbin         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 CXX = c++
 
-CXXFLAGS = -Wall -Wextra -Werror -std=c++98 -g
+CXXFLAGS = -Wall -Wextra -Werror -std=c++98
 
 NAME1 = exec_with_std
 NAME2 = exec_with_ft

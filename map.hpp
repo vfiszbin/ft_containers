@@ -58,14 +58,14 @@ namespace ft
 			///------------------///
 			
 			//Empty constructor
-			explicit map (const key_compare& comp = key_compare(), const allocator_type& alloc = allocator_type()) : _tree(tree_type(value_compare(_comp), _alloc)), _comp(comp), _alloc(alloc) {}
+			explicit map (const key_compare& comp = key_compare(), const allocator_type& alloc = allocator_type()) : _comp(comp), _alloc(alloc), _tree(tree_type(value_compare(_comp), _alloc)) {}
 
 			//Range constructor
 			//Constructs a container with as many elements as the range [first,last),
 			//with each element constructed from its corresponding element in that range.
 			template <class InputIterator>
 			map (InputIterator first, InputIterator last, const key_compare& comp = key_compare(), const allocator_type& alloc = allocator_type())
-				: _tree(tree_type(value_compare(_comp), _alloc)), _comp(comp), _alloc(alloc) 
+				:_comp(comp), _alloc(alloc), _tree(tree_type(value_compare(_comp), _alloc))
 			{
 				insert(first, last); //insert range in maps's tree
 			}
@@ -73,7 +73,7 @@ namespace ft
 			//Copy constructor
 			//Constructs a container with a copy of each of the elements in x.
 			//The copy constructor creates a container that keeps and uses copies of x's allocator and comparison object.
-			map (const map& x) : _tree(tree_type(value_compare(_comp), _alloc)), _comp(x._comp), _alloc(x._alloc)
+			map (const map& x) : _comp(x._comp), _alloc(x._alloc), _tree(tree_type(value_compare(_comp), _alloc))
 			{
 				const_iterator beg = x.begin();
 				insert(x.begin(), x.end());
@@ -380,10 +380,10 @@ namespace ft
 				return allocator_type(_alloc);
 			}
 		private:
-			typedef AVLTree<value_type, value_compare, allocator_type> tree_type;
-			tree_type _tree;
 			key_compare _comp;
 			allocator_type _alloc;
+			typedef AVLTree<value_type, value_compare, allocator_type> tree_type;
+			tree_type _tree;
 
 	};
 

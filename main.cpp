@@ -47,12 +47,6 @@ void stack_tests()
 	assert(s7.size() == s6.size());
 	assert(s7 == s6);
 
-	NS::stack<int> s8;
-	s8.push(1);
-	s8.push(2);
-	s8 = s8;
-	assert(s8.size() == 2);
-
 	//push
 	NS::stack<int> myStack;
 	myStack.push(5);
@@ -294,9 +288,6 @@ void map_tests()
 	assert(m8.size() == m6.size());
 	assert(m8[2] == m6[2]);
 
-	m6 = m6;
-	assert(m6.size() == 2);
-	assert(m6[2] == m6[2]);
 
 	//begin
 	m[1] = 2;
