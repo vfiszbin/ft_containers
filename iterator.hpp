@@ -6,7 +6,7 @@
 /*   By: vfiszbin <vfiszbin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/11 09:49:47 by vfiszbin          #+#    #+#             */
-/*   Updated: 2023/01/17 17:44:57 by vfiszbin         ###   ########.fr       */
+/*   Updated: 2023/01/18 08:35:15 by vfiszbin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -94,8 +94,7 @@ namespace ft
 			typedef typename ft::iterator<ft::random_access_iterator_tag, T>::difference_type difference_type;
 			typedef typename ft::iterator<ft::random_access_iterator_tag, T>::pointer pointer;
 			typedef typename ft::iterator<ft::random_access_iterator_tag, T>::reference reference;
-			// typedef typename ft::iterator<ft::random_access_iterator_tag, T>::iterator_category iterator_category;
-			typedef	std::random_access_iterator_tag iterator_category; //besoin pour std::distance ! enlever ?
+			typedef	std::random_access_iterator_tag iterator_category; //needed for std::distance
 
 			///------------------///
 			/// MEMBER FUNCTIONS ///

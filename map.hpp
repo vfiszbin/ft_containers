@@ -3,7 +3,6 @@
 
 # include <memory>
 # include <functional>
-# include <map> //ENLEVER !!!
 # include "utils.hpp"
 # include "avl_tree.hpp"
 # include "iterator.hpp"
@@ -26,7 +25,7 @@ namespace ft
 			//Nested value_compare class
 			//Returns a comparison object that can be used to compare two elements to get whether the key of the first one goes before the second.
 			class value_compare
-			{   // in C++98, it is required to inherit binary_function<value_type,value_type,bool> !!!
+			{
 				friend class map;
 				protected:
 					Compare comp;
@@ -46,14 +45,8 @@ namespace ft
 			typedef typename allocator_type::const_reference const_reference;
 			typedef typename allocator_type::pointer pointer;
 			typedef typename allocator_type::const_pointer const_pointer;
-
-			// typedef typename std::map<key_type, mapped_type>::iterator iterator; //REMPLACER PAR MON ITERATOR !!!
-			// typedef typename std::map<key_type, mapped_type>::const_iterator const_iterator; //REMPLACER PAR MON ITERATOR !!!
 			typedef ft::avl_tree_iterator<ft::TreeNode<value_type>, false> iterator;
 			typedef ft::avl_tree_iterator<const ft::TreeNode<value_type>, true> const_iterator;
-
-			// typedef typename std::map<key_type, mapped_type>::reverse_iterator reverse_iterator; //REMPLACER PAR MON ITERATOR !!!
-			// typedef typename std::map<key_type, mapped_type>::const_reverse_iterator const_reverse_iterator; //REMPLACER PAR MON ITERATOR !!!
 			typedef ft::reverse_iterator<iterator> reverse_iterator;
 			typedef ft::reverse_iterator<const_iterator> const_reverse_iterator;
 
@@ -83,7 +76,7 @@ namespace ft
 			map (const map& x) : _tree(tree_type(value_compare(_comp), _alloc)), _comp(x._comp), _alloc(x._alloc)
 			{
 				const_iterator beg = x.begin();
-				insert(x.begin(), x.end()); //FAUT COPIE CHAQUE ELEM DE X !!!
+				insert(x.begin(), x.end());
 			}
 
 			//Destructor
@@ -177,7 +170,7 @@ namespace ft
 			//If not, inserts a new element with that key and returns a reference to its mapped value
 			mapped_type& operator[] (const key_type& k)
 			{
-				return (*((insert(ft::make_pair(k, mapped_type()))).first)).second; //MARCHE ? !!!
+				return (*((insert(ft::make_pair(k, mapped_type()))).first)).second;
 			}
 
 			//Returns a reference to the mapped value of the element identified with key k.
@@ -185,8 +178,8 @@ namespace ft
 			mapped_type& at (const key_type& k)
 			{
 				iterator it_found = find(k);
-				if (*it_found == end())
-					throw std::out_of_range("map::at key does not exist");
+				if (it_found == end())
+					throw std::out_of_range("map::at");
 				return it_found->second;
 			}
 
@@ -196,7 +189,7 @@ namespace ft
 			{
 				iterator it_found = find(k);
 				if (*it_found == end())
-					throw std::out_of_range("map::at key does not exist");
+					throw std::out_of_range("map::at");
 				return it_found->second;
 			}
 
@@ -214,7 +207,7 @@ namespace ft
 			//Insert val using position as an hint about where to insert it. Position might not be used.
 			iterator insert (iterator position, const value_type& val)
 			{
-				(void)position; //UTILISER LE HINT ? !!!
+				(void)position;
 				return insert(val).first;
 			}
 
@@ -277,8 +270,6 @@ namespace ft
 			{ 
 				return value_compare(key_compare()); 
 			}
-
-			//Two keys are considered equivalent if the container's comparison object returns false reflexively (i.e., no matter the order in which the elements are passed as arguments) !!!
 
 			//Searches the container for an element with a key equivalent to k and returns an iterator to it if found, otherwise it returns an iterator to map::end.
 			iterator find (const key_type& k)
@@ -389,7 +380,7 @@ namespace ft
 			}
 		private:
 			typedef AVLTree<value_type, value_compare, allocator_type> tree_type;
-			tree_type _tree; //UTILISER MEME ALLOCATOR QUE MAP ?!!!
+			tree_type _tree;
 			key_compare _comp;
 			allocator_type _alloc;
 

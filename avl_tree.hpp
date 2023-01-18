@@ -6,18 +6,15 @@
 /*   By: vfiszbin <vfiszbin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/12 16:02:00 by vfiszbin          #+#    #+#             */
-/*   Updated: 2023/01/17 18:25:46 by vfiszbin         ###   ########.fr       */
+/*   Updated: 2023/01/18 08:42:54 by vfiszbin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef BINARY_SEARCH_TREE_HPP
 # define BINARY_SEARCH_TREE_HPP
 
-#include <iostream> //REMOVE !!!
-#define SPACE 10 //REMOVE !!!
 # include "utils.hpp"
 # include <memory>
-// #include <cstring> //!!!
 
 namespace ft
 {
@@ -85,26 +82,6 @@ namespace ft
 				else 
 					return false;
 			}
-			
-			// // Get Height  !!!
-			// int height(node_type * r) const
-			// {
-			// 	if (r == NULL)
-			// 		return -1; //base height is -1 for NULL nodes
-					
-			// 	else 
-			// 	{
-			// 		//recursively compute height in each subtree
-			// 		int lheight = height(r->left);
-			// 		int rheight = height(r->right);
-
-			// 		//use the biggest height, +1 to account for current node
-			// 		if (lheight > rheight)
-			// 			return (lheight + 1);
-			// 		else 
-			// 			return (rheight + 1);
-			// 	}
-			// }
 
 			//return height for node r
 			int height(node_type * r) const
@@ -464,84 +441,7 @@ namespace ft
 				return r;
 			}
 
-
-			//ENELVER TOUS CES PRINT !!!
-			void print2D(node_type * r, int space) {
-				if (r == NULL) // Base case  1
-				return;
-				space += SPACE; // Increase distance between levels   2
-				print2D(r -> right, space); // Process right child first 3 
-				std::cout << std::endl;
-				for (int i = SPACE; i < space; i++) // 5 
-				std::cout << " "; // 5.1  
-				if (r->parent)
-					std::cout << r -> value.first << "," << r->value.second << "," << r->parent->value.first <<"\n"; // 6 t 
-				else
-					std::cout << r -> value.first << "," << r->value.second << "," << "\n"; // 6
-				print2D(r -> left, space); // Process left child  7
-			}
-			void printPreorder(node_type * r) //(current node, Left, Right) 
-			{
-				if (r == NULL)
-				return;
-				/* first print data of node */
-				if (r->parent)
-					std::cout << r -> value.first << "," << r->value.second << "," << r->parent->value.first << " "; 
-				else
-					std::cout << r -> value.first << "," << r->value.second  << " ";
-				/* then recur on left sutree */
-				printPreorder(r -> left);
-				/* now recur on right subtree */
-				printPreorder(r -> right);
-			}
-
-			void printInorder(node_type * r) //  (Left, current node, Right)
-			{
-				if (r == NULL)
-				return;
-				/* first recur on left child */
-				printInorder(r -> left);
-				/* then print the data of node */
-				if (r->parent)
-					std::cout << r -> value.first << "," << r->value.second << "," << r->parent->value.first << " "; 
-				else
-					std::cout << r -> value.first << "," << r->value.second  << " ";
-				/* now recur on right child */
-				printInorder(r -> right);
-			}
-			void printPostorder(node_type * r) //(Left, Right, Root)
-			{
-				if (r == NULL)
-				return;
-				// first recur on left subtree 
-				printPostorder(r -> left);
-				// then recur on right subtree 
-				printPostorder(r -> right);
-				// now deal with the node 
-				if (r->parent)
-					std::cout << r -> value.first << "," << r->value.second << "," << r->parent->value.first << " ";
-				else
-				std::cout << r -> value.first << "," << r->value.second  << " ";
-			}
-
-			/* Print nodes at a given level */
-			void printGivenLevel(node_type * r, int level) {
-				if (r == NULL)
-				return;
-				else if (level == 0)
-				std::cout << r -> value.first << "," << r->value.second  << " ";
-				else // level > 0  
-				{
-				printGivenLevel(r -> left, level - 1);
-				printGivenLevel(r -> right, level - 1);
-				}
-			}
-			void printLevelOrderBFS(node_type * r) {
-				int h = height(r);
-				for (int i = 0; i <= h; i++)
-				printGivenLevel(r, i);
-			}
-
+			//Search for the node with value v, return the node if found, NULL otherwise
 			node_type * iterative_search(T v) const
 			{
 				if (root == NULL) 
@@ -604,7 +504,6 @@ namespace ft
 			value_compare _comp;
 
 	};
-
 
 }
 

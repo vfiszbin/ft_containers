@@ -6,7 +6,7 @@
 /*   By: vfiszbin <vfiszbin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/11 09:28:35 by vfiszbin          #+#    #+#             */
-/*   Updated: 2023/01/16 18:36:10 by vfiszbin         ###   ########.fr       */
+/*   Updated: 2023/01/18 08:38:55 by vfiszbin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -217,7 +217,7 @@ namespace ft
 				{
 					//If n is also greater than the current container capacity, an automatic reallocation of the allocated storage space takes place.
 					if (n > _capacity)
-						reserve(n); //ALLOUER PLUS ? !!!
+						reserve(n);
 
 					for (size_type i = _size; i < n; i++)
 						_alloc.construct(_start + i, val); //constructs (by calling the constructor of value_type with argument val) an element object on the location pointed by _start + i
@@ -248,7 +248,6 @@ namespace ft
 				if (n <= _capacity)
 					return;
 
-				//PROTEGER LA PARTIE ALLOCATION ET CONSTRUCT ?!
 				//Allocate a new block of memory and copy the old container into the new one
 				pointer new_start = _alloc.allocate(n); //allocates a block of storage with a size large enough to contain n elements of type value_type
 				for (size_type i = 0; i < _size; i++)
@@ -429,7 +428,7 @@ namespace ft
 				//Reallocation if new vector size surpasses the current vector capacity
 				if (_size + n > _capacity)
 				{
-					pointer new_start = _alloc.allocate(_size + n); //ALLOUER PLUS ?!
+					pointer new_start = _alloc.allocate(_size + n);
 					
 					//Reconstruct elements in new array up until the insert_index
 					for (size_type i = 0; i < insert_index; i++)
@@ -491,7 +490,7 @@ namespace ft
 				//Reallocation if new vector size surpasses the current vector capacity
 				if (_size + n > _capacity)
 				{
-					pointer new_start = _alloc.allocate(_size + n); //ALLOUER PLUS ?!
+					pointer new_start = _alloc.allocate(_size + n);
 					
 					//Reconstruct elements in new array up until the insert_index
 					for (size_type i = 0; i < insert_index; i++)
